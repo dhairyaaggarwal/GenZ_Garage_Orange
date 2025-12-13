@@ -1,5 +1,6 @@
 
 export interface OnboardingState {
+  firstName: string | null;
   investmentExperience: string | null;
   investmentHorizon: string | null;
   futureGoals: string[];
@@ -20,6 +21,7 @@ export interface OnboardingState {
 }
 
 const initialState: OnboardingState = {
+  firstName: null,
   investmentExperience: null,
   investmentHorizon: null,
   futureGoals: [],

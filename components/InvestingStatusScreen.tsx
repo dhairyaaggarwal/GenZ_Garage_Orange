@@ -105,10 +105,10 @@ export const InvestingStatusScreen: React.FC<InvestingStatusScreenProps> = ({ on
       <CircularHeader currentStep={4} totalSteps={4} />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto overflow-y-auto no-scrollbar pb-32">
+      <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-6 overflow-y-auto no-scrollbar pb-32">
          
          {/* Title */}
-         <h1 className="text-4xl text-gray-900 text-center mb-6 leading-tight drop-shadow-sm mt-4">
+         <h1 className="text-4xl text-gray-900 text-center mb-6 leading-tight drop-shadow-sm">
            <span className="font-bold">Are you currently</span> <br/> <span className="italic font-serif">investing or saving?</span>
          </h1>
 
@@ -155,7 +155,7 @@ export const InvestingStatusScreen: React.FC<InvestingStatusScreenProps> = ({ on
             <Button 
                onClick={handleContinue}
                disabled={selectedStatus.length === 0}
-               className="w-[85%] mx-auto block rounded-full py-4 text-lg transition-all shadow-xl shadow-orange-900/20 disabled:opacity-50 disabled:cursor-not-allowed bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-gray-900 font-extrabold tracking-wide border-none"
+               className="w-[85%] mx-auto block rounded-full py-4 text-lg transition-all shadow-xl shadow-orange-900/20 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-gray-900 font-extrabold tracking-wide border-none"
             >
                Continue
             </Button>

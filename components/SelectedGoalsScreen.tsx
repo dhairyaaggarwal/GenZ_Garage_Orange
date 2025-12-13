@@ -119,7 +119,7 @@ export const SelectedGoalsScreen: React.FC<SelectedGoalsScreenProps> = ({ select
       <CircularHeader currentStep={2} totalSteps={4} />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-2 overflow-y-auto no-scrollbar pb-32">
+      <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-6 overflow-y-auto no-scrollbar pb-32">
          
          {/* Title */}
          <h1 className="text-3xl font-bold text-gray-900 text-center mb-6 leading-tight drop-shadow-sm">
@@ -170,7 +170,7 @@ export const SelectedGoalsScreen: React.FC<SelectedGoalsScreenProps> = ({ select
                onClick={handleContinue}
                className="w-[85%] mx-auto block rounded-full py-4 text-lg transition-all shadow-xl shadow-orange-900/20 bg-gradient-to-r from-orange-500 to-yellow-500 hover:from-orange-600 hover:to-yellow-600 text-gray-900 font-extrabold tracking-wide border-none"
             >
-               Sounds good — Let’s go
+               Continue
             </Button>
          </div>
       </div>

@@ -111,10 +111,10 @@ export const FutureGoalsScreen: React.FC<FutureGoalsScreenProps> = ({ hasInveste
       <CircularHeader currentStep={2} totalSteps={4} />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto overflow-y-auto no-scrollbar pb-32">
+      <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-6 overflow-y-auto no-scrollbar pb-32">
          
          {/* Title */}
-         <h1 className="text-4xl text-gray-900 text-center mb-2 leading-tight drop-shadow-sm mt-4">
+         <h1 className="text-4xl text-gray-900 text-center mb-2 leading-tight drop-shadow-sm">
            <span className="font-bold">What are your</span> <br/> <span className="italic font-serif">future goals?</span>
          </h1>
 

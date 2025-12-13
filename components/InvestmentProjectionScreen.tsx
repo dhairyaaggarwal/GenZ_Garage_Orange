@@ -110,6 +110,18 @@ export const InvestmentProjectionScreen: React.FC<InvestmentProjectionScreenProp
              {graphData.map((height, i) => (
                <div key={i} className="flex-1 flex flex-col justify-end items-center group relative h-full">
                  
+                 {/* Label for first item (Today) */}
+                 {i === 0 && (
+                   <div 
+                      className={`absolute bottom-[105%] transition-all duration-700 delay-[800ms] ease-out z-20 ${animateGraph ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'}`}
+                      style={{ bottom: `${height}%`, marginBottom: '8px' }}
+                   >
+                     <div className="text-gray-500 text-[10px] font-bold bg-white/50 backdrop-blur-sm px-1.5 py-0.5 rounded-md">
+                       ₹500
+                     </div>
+                   </div>
+                 )}
+
                  {/* Bubble for last item */}
                  {i === totalBars - 1 && (
                    <div 

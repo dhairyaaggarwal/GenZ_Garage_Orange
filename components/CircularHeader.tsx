@@ -6,8 +6,8 @@ interface CircularHeaderProps {
 }
 
 export const CircularHeader: React.FC<CircularHeaderProps> = ({ currentStep, totalSteps = 4 }) => {
-  const size = 80;
-  const strokeWidth = 4;
+  const size = 52; // Reduced from 80
+  const strokeWidth = 3.5;
   const radius = (size - strokeWidth) / 2;
   const center = size / 2;
   
@@ -69,8 +69,8 @@ export const CircularHeader: React.FC<CircularHeaderProps> = ({ currentStep, tot
         </svg>
         
         {/* Logo in Center */}
-        <div className="relative w-10 h-10 shrink-0 z-10 flex items-center justify-center">
-           <svg viewBox="0 0 100 100" className="w-8 h-8 shrink-0 drop-shadow-sm">
+        <div className="relative w-6 h-6 shrink-0 z-10 flex items-center justify-center">
+           <svg viewBox="0 0 100 100" className="w-5 h-5 shrink-0 drop-shadow-sm">
              <path d="M50 25 C 50 25 65 5 85 15 C 85 15 75 35 50 35" fill="#65a30d" />
              <path d="M50 25 C 50 25 35 5 15 15 C 15 15 25 35 50 35" fill="#4d7c0f" />
              <circle cx="50" cy="60" r="35" fill="url(#orangeGradCirc)" />

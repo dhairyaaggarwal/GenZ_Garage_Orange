@@ -3,6 +3,9 @@ import { WelcomeScreen } from './components/WelcomeScreen';
 import { InvestmentProjectionScreen } from './components/InvestmentProjectionScreen';
 import { AutomatedUpdateScreen } from './components/AutomatedUpdateScreen';
 import { BuddyIntroScreen } from './components/BuddyIntroScreen';
+import { AskNameScreen } from './components/AskNameScreen';
+import { AgeConfirmScreen } from './components/AgeConfirmScreen';
+import { UnderageScreen } from './components/UnderageScreen';
 import { DoNotInvestScreen } from './components/DoNotInvestScreen';
 import { InvestedBeforeScreen } from './components/InvestedBeforeScreen';
 import { FutureGoalsScreen } from './components/FutureGoalsScreen';
@@ -28,21 +31,24 @@ enum AppState {
   AUTOMATED_UPDATE = 3,
   DO_NOT_INVEST = 4,
   BUDDY_INTRO = 5,
-  INVESTED_BEFORE = 6,
-  FUTURE_GOALS = 7,
-  SELECTED_GOALS = 8,
-  HELP_OPTIONS = 9,
-  SELECTED_HELP_OPTIONS = 10,
-  INVESTING_STATUS = 11,
-  INVESTING_BENEFIT = 12,
-  INCOME = 13,
-  INVESTMENT_DURATION = 14,
-  RISK_TOLERANCE = 15,
-  FINALIZE_PLAN = 16,
-  BUDDY_CELEBRATE = 17,
-  SIGNUP = 18,
-  VERIFY_EMAIL_OTP = 19,
-  LOGIN_EMAIL = 20, // New Step
+  ASK_NAME = 6, // New
+  AGE_CONFIRM = 7, // New
+  UNDERAGE = 8, // New
+  INVESTED_BEFORE = 9,
+  FUTURE_GOALS = 10,
+  SELECTED_GOALS = 11,
+  HELP_OPTIONS = 12,
+  SELECTED_HELP_OPTIONS = 13,
+  INVESTING_STATUS = 14,
+  INVESTING_BENEFIT = 15,
+  INCOME = 16,
+  INVESTMENT_DURATION = 17,
+  RISK_TOLERANCE = 18,
+  FINALIZE_PLAN = 19,
+  BUDDY_CELEBRATE = 20,
+  SIGNUP = 21,
+  VERIFY_EMAIL_OTP = 22,
+  LOGIN_EMAIL = 23,
 }
 
 export default function App() {
@@ -67,7 +73,9 @@ export default function App() {
     else if (currentStep === AppState.PROJECTION) setCurrentStep(AppState.AUTOMATED_UPDATE);
     else if (currentStep === AppState.AUTOMATED_UPDATE) setCurrentStep(AppState.DO_NOT_INVEST);
     else if (currentStep === AppState.DO_NOT_INVEST) setCurrentStep(AppState.BUDDY_INTRO);
-    else if (currentStep === AppState.BUDDY_INTRO) setCurrentStep(AppState.INVESTED_BEFORE);
+    else if (currentStep === AppState.BUDDY_INTRO) setCurrentStep(AppState.ASK_NAME); // New Flow
+    else if (currentStep === AppState.ASK_NAME) setCurrentStep(AppState.AGE_CONFIRM); // New Flow
+    // Age confirm handles branching internally via handleAgeConfirm
     else if (currentStep === AppState.INVESTED_BEFORE) setCurrentStep(AppState.FUTURE_GOALS);
     else if (currentStep === AppState.FUTURE_GOALS) setCurrentStep(AppState.SELECTED_GOALS);
     else if (currentStep === AppState.SELECTED_GOALS) setCurrentStep(AppState.HELP_OPTIONS);
@@ -85,9 +93,16 @@ export default function App() {
       console.log("Onboarding Complete!");
       alert("Email Verified! Welcome to Orange.");
     }
-    // Login flow continuation
     else if (currentStep === AppState.LOGIN_EMAIL) {
        setCurrentStep(AppState.VERIFY_EMAIL_OTP);
+    }
+  };
+
+  const handleAgeConfirm = (isOver18: boolean) => {
+    if (isOver18) {
+      setCurrentStep(AppState.INVESTED_BEFORE);
+    } else {
+      setCurrentStep(AppState.UNDERAGE);
     }
   };
 
@@ -100,15 +115,11 @@ export default function App() {
   };
 
   const handleChangeEmail = () => {
-     // If coming from login, go back to login. If signup, go back to signup.
-     // For simplicity here, we assume if you are at verify step you might want to go to signup or login.
-     // But based on previous logic, let's default to signup unless we track history.
      setCurrentStep(AppState.SIGNUP);
   };
 
   const handleInvestedBeforeSelection = (hasInvested: boolean) => {
     setHasInvestedBefore(hasInvested);
-    // Explicitly persist this simple boolean state as 'investmentExperience' for the summary screen
     setValue('investmentExperience', hasInvested ? 'investing' : 'never_started');
     handleNext();
   };
@@ -150,7 +161,6 @@ export default function App() {
   };
 
   const handleJumpToStep = (step: number) => {
-    // Only allow jumping within the first 5 intro screens
     if (step >= 1 && step <= 5) {
       setCurrentStep(step);
     }
@@ -196,6 +206,22 @@ export default function App() {
           onContinue={handleNext}
           onJumpToStep={handleJumpToStep}
         />
+      )}
+
+      {currentStep === AppState.ASK_NAME && (
+        <AskNameScreen
+          onContinue={handleNext}
+        />
+      )}
+
+      {currentStep === AppState.AGE_CONFIRM && (
+        <AgeConfirmScreen
+          onConfirm={handleAgeConfirm}
+        />
+      )}
+
+      {currentStep === AppState.UNDERAGE && (
+        <UnderageScreen />
       )}
 
       {currentStep === AppState.INVESTED_BEFORE && (
