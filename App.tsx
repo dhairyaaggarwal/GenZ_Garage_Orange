@@ -22,6 +22,14 @@ import { BuddyCelebrateScreen } from './components/BuddyCelebrateScreen';
 import { SignupScreen } from './components/SignupScreen';
 import { VerifyEmailOtpScreen } from './components/VerifyEmailOtpScreen';
 import { LoginEmailScreen } from './components/LoginEmailScreen';
+import { CreatePlaylistIntroScreen } from './components/CreatePlaylistIntroScreen';
+import { CreatePlaylistInterestsScreen } from './components/CreatePlaylistInterestsScreen';
+import { CreatePlaylistCompaniesScreen } from './components/CreatePlaylistCompaniesScreen';
+import { CreatePlaylistGoalScreen } from './components/CreatePlaylistGoalScreen';
+import { PlaylistGenerationLoadingScreen } from './components/PlaylistGenerationLoadingScreen';
+import { PlaylistResultScreen } from './components/PlaylistResultScreen';
+import { PlaylistDetailWrapper } from './components/PlaylistDetailWrapper';
+import { MainApp } from './components/MainApp';
 import { persistOnboardingState, setValue, multiSelectToggle, getOnboardingState } from './utils/onboardingState';
 
 // Updated AppState to include new onboarding steps
@@ -49,6 +57,14 @@ enum AppState {
   SIGNUP = 21,
   VERIFY_EMAIL_OTP = 22,
   LOGIN_EMAIL = 23,
+  HOME = 24, // New Home/Main App State
+  CREATE_PLAYLIST_INTRO = 25, // New Intro Screen
+  CREATE_PLAYLIST_INTERESTS = 26, // New Interests Screen
+  CREATE_PLAYLIST_GOAL = 27, // New Goal Screen
+  CREATE_PLAYLIST_LOADING = 28, // New Loading Screen
+  CREATE_PLAYLIST_RESULT = 29, // New Result Screen (Breakdown)
+  CREATE_PLAYLIST_DETAIL = 30, // New Detail Screen (Invest)
+  CREATE_PLAYLIST_COMPANIES = 31, // New Companies Screen
 }
 
 export default function App() {
@@ -66,6 +82,11 @@ export default function App() {
     if (state.futureGoals) setUserGoals(state.futureGoals);
     if (state.selectedInvestingStatus) setUserInvestingStatus(state.selectedInvestingStatus);
     if (state.selectedHelpOptions) setUserHelpOptions(state.selectedHelpOptions);
+    
+    // Check if session token exists to auto-login (optional optimization)
+    if (state.sessionToken && currentStep === AppState.LANDING) {
+        // Could verify token here, for now simpler to just start fresh or persist
+    }
   }, []);
 
   const handleNext = () => {
@@ -90,11 +111,32 @@ export default function App() {
     else if (currentStep === AppState.BUDDY_CELEBRATE) setCurrentStep(AppState.SIGNUP);
     else if (currentStep === AppState.SIGNUP) setCurrentStep(AppState.VERIFY_EMAIL_OTP);
     else if (currentStep === AppState.VERIFY_EMAIL_OTP) {
-      console.log("Onboarding Complete!");
-      alert("Email Verified! Welcome to Orange.");
+       setCurrentStep(AppState.HOME);
     }
     else if (currentStep === AppState.LOGIN_EMAIL) {
        setCurrentStep(AppState.VERIFY_EMAIL_OTP);
+    }
+    else if (currentStep === AppState.CREATE_PLAYLIST_INTRO) {
+       setCurrentStep(AppState.CREATE_PLAYLIST_INTERESTS);
+    }
+    else if (currentStep === AppState.CREATE_PLAYLIST_INTERESTS) {
+       setCurrentStep(AppState.CREATE_PLAYLIST_COMPANIES);
+    }
+    else if (currentStep === AppState.CREATE_PLAYLIST_COMPANIES) {
+       setCurrentStep(AppState.CREATE_PLAYLIST_GOAL); 
+    }
+    else if (currentStep === AppState.CREATE_PLAYLIST_GOAL) {
+       setCurrentStep(AppState.CREATE_PLAYLIST_LOADING);
+    }
+    else if (currentStep === AppState.CREATE_PLAYLIST_LOADING) {
+       setCurrentStep(AppState.CREATE_PLAYLIST_RESULT);
+    }
+    else if (currentStep === AppState.CREATE_PLAYLIST_RESULT) {
+       // Navigate directly to Home after saving
+       setCurrentStep(AppState.HOME);
+    }
+    else if (currentStep === AppState.CREATE_PLAYLIST_DETAIL) {
+       setCurrentStep(AppState.HOME);
     }
   };
 
@@ -316,6 +358,59 @@ export default function App() {
         <LoginEmailScreen
           onBack={handleBackToLanding}
           onContinue={handleNext}
+        />
+      )}
+
+      {currentStep === AppState.CREATE_PLAYLIST_INTRO && (
+        <CreatePlaylistIntroScreen 
+          onContinue={handleNext}
+          onBack={() => setCurrentStep(AppState.HOME)}
+        />
+      )}
+
+      {currentStep === AppState.CREATE_PLAYLIST_INTERESTS && (
+        <CreatePlaylistInterestsScreen
+          onContinue={handleNext}
+          onBack={() => setCurrentStep(AppState.CREATE_PLAYLIST_INTRO)}
+        />
+      )}
+
+      {currentStep === AppState.CREATE_PLAYLIST_COMPANIES && (
+        <CreatePlaylistCompaniesScreen
+          onContinue={handleNext}
+          onBack={() => setCurrentStep(AppState.CREATE_PLAYLIST_INTERESTS)}
+        />
+      )}
+
+      {currentStep === AppState.CREATE_PLAYLIST_GOAL && (
+        <CreatePlaylistGoalScreen
+          onContinue={handleNext}
+          onBack={() => setCurrentStep(AppState.CREATE_PLAYLIST_COMPANIES)}
+        />
+      )}
+
+      {currentStep === AppState.CREATE_PLAYLIST_LOADING && (
+        <PlaylistGenerationLoadingScreen 
+          onComplete={handleNext}
+        />
+      )}
+
+      {currentStep === AppState.CREATE_PLAYLIST_RESULT && (
+        <PlaylistResultScreen
+          onContinue={handleNext}
+          onInvestLater={() => setCurrentStep(AppState.HOME)}
+        />
+      )}
+
+      {currentStep === AppState.CREATE_PLAYLIST_DETAIL && (
+        <PlaylistDetailWrapper
+          onBack={() => setCurrentStep(AppState.HOME)}
+        />
+      )}
+
+      {currentStep === AppState.HOME && (
+        <MainApp 
+          onRetakeQuiz={() => setCurrentStep(AppState.CREATE_PLAYLIST_INTRO)}
         />
       )}
 
