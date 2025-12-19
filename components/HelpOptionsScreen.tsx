@@ -102,8 +102,8 @@ export const HelpOptionsScreen: React.FC<HelpOptionsScreenProps> = ({ onContinue
       {/* Background elements */}
       <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
 
-      {/* Header with Circular Progress (Step 3 of 4) */}
-      <CircularHeader currentStep={3} totalSteps={4} />
+      {/* Header with Circular Progress (Step 3 of 5) */}
+      <CircularHeader currentStep={3} totalSteps={5} />
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto overflow-y-auto no-scrollbar pb-32">

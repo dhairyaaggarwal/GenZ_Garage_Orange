@@ -97,8 +97,8 @@ export const RiskToleranceScreen: React.FC<RiskToleranceScreenProps> = ({ onCont
       {/* Background - Clean gradient, no particles */}
       <div className="absolute inset-0 bg-gradient-to-b from-white/20 to-transparent pointer-events-none"></div>
 
-      {/* Header with Circular Progress (Step 4 of 4) */}
-      <CircularHeader currentStep={4} totalSteps={4} />
+      {/* Header with Circular Progress (Step 4 of 5) */}
+      <CircularHeader currentStep={4} totalSteps={5} />
 
       {/* Voice Activity Indicator */}
       <div className="absolute top-[5.5rem] left-0 w-full flex justify-center pointer-events-none z-20">
