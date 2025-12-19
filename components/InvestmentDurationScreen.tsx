@@ -7,12 +7,11 @@ interface InvestmentDurationScreenProps {
 }
 
 const DURATION_OPTIONS = [
-  "Fewer than 5 years",
-  "5–10 years",
-  "10–20 years",
-  "20–30 years",
-  "30+ years",
-  "I don't know yet"
+  { id: "5_years", label: "5 years" },
+  { id: "10_years", label: "10 years" },
+  { id: "20_years", label: "20 years" },
+  { id: "30_years", label: "30 years" },
+  { id: "30plus_years", label: "30+ years" }
 ];
 
 const ELEVEN_LABS_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"; 
@@ -86,8 +85,8 @@ export const InvestmentDurationScreen: React.FC<InvestmentDurationScreenProps> =
     }
   };
 
-  const handleSelection = (duration: string) => {
-    setSelectedDuration(duration);
+  const handleSelection = (id: string) => {
+    setSelectedDuration(id);
   };
 
   return (
@@ -109,10 +108,10 @@ export const InvestmentDurationScreen: React.FC<InvestmentDurationScreenProps> =
          </h1>
          <div className="w-full flex-1 overflow-y-auto no-scrollbar pb-32 space-y-3">
            {DURATION_OPTIONS.map((option) => {
-             const isSelected = selectedDuration === option;
+             const isSelected = selectedDuration === option.id;
              return (
-               <button key={option} onClick={() => handleSelection(option)} className={`w-full p-4 rounded-2xl flex items-center justify-center transition-all duration-200 font-bold text-lg border-2 shadow-sm ${isSelected ? 'bg-gradient-to-r from-orange-400 to-yellow-400 text-gray-900 border-transparent scale-[1.02] shadow-orange-500/20' : 'bg-white/80 backdrop-blur-sm border-transparent text-gray-700 hover:bg-white hover:scale-[1.01]'}`} aria-label={option} aria-pressed={isSelected}>
-                 {option}
+               <button key={option.id} onClick={() => handleSelection(option.id)} className={`w-full p-4 rounded-2xl flex items-center justify-center transition-all duration-200 font-bold text-lg border-2 shadow-sm ${isSelected ? 'bg-gradient-to-r from-orange-400 to-yellow-400 text-gray-900 border-transparent scale-[1.02] shadow-orange-500/20' : 'bg-white/80 backdrop-blur-sm border-transparent text-gray-700 hover:bg-white hover:scale-[1.01]'}`} aria-label={option.label} aria-pressed={isSelected}>
+                 {option.label}
                </button>
              );
            })}

@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { WelcomeScreen } from './components/WelcomeScreen';
 import { InvestmentProjectionScreen } from './components/InvestmentProjectionScreen';
@@ -21,68 +22,25 @@ import { BuddyCelebrateScreen } from './components/BuddyCelebrateScreen';
 import { SignupScreen } from './components/SignupScreen';
 import { VerifyEmailOtpScreen } from './components/VerifyEmailOtpScreen';
 import { LoginEmailScreen } from './components/LoginEmailScreen';
-import { persistOnboardingState, setValue, getOnboardingState } from './utils/onboardingState';
-
-enum AppState {
-  LANDING = 1,
-  PROJECTION = 2,
-  AUTOMATED_UPDATE = 3,
-  DO_NOT_INVEST = 4,
-  BUDDY_INTRO = 5,
-  ASK_NAME = 6,
-  AGE_CONFIRM = 7,
-  UNDERAGE = 8,
-  INVESTED_BEFORE = 9,
-  FUTURE_GOALS = 10,
-  SELECTED_GOALS = 11,
-  HELP_OPTIONS = 12,
-  SELECTED_HELP_OPTIONS = 13,
-  INVESTING_STATUS = 14,
-  INVESTING_BENEFIT = 15,
-  INVESTMENT_DURATION = 16,
-  RISK_TOLERANCE = 17,
-  FINALIZE_PLAN = 18,
-  BUDDY_CELEBRATE = 19,
-  SIGNUP = 20,
-  VERIFY_EMAIL_OTP = 21,
-  LOGIN_EMAIL = 22,
-}
+import { AnalyzingScreen } from './components/AnalyzingScreen';
+import { Dashboard } from './components/Dashboard';
+import { persistOnboardingState, setValue, getOnboardingState, calculateRiskProfile } from './utils/onboardingState';
+import { InvestmentPlan, UserProfile, AppState } from './types';
 
 export default function App() {
   const [currentStep, setCurrentStep] = useState<AppState>(AppState.LANDING);
   const [hasInvestedBefore, setHasInvestedBefore] = useState<boolean>(false);
   const [userGoals, setUserGoals] = useState<string[]>([]);
-  const [userInvestingStatus, setUserInvestingStatus] = useState<string[]>([]);
-  const [userHelpOptions, setUserHelpOptions] = useState<string[]>([]);
+  const [generatedPlan, setGeneratedPlan] = useState<InvestmentPlan | null>(null);
 
   useEffect(() => {
     persistOnboardingState();
     const state = getOnboardingState();
     if (state.futureGoals) setUserGoals(state.futureGoals);
-    if (state.selectedInvestingStatus) setUserInvestingStatus(state.selectedInvestingStatus);
-    if (state.selectedHelpOptions) setUserHelpOptions(state.selectedHelpOptions);
   }, []);
 
   const handleNext = () => {
-    if (currentStep === AppState.LANDING) setCurrentStep(AppState.PROJECTION);
-    else if (currentStep === AppState.PROJECTION) setCurrentStep(AppState.AUTOMATED_UPDATE);
-    else if (currentStep === AppState.AUTOMATED_UPDATE) setCurrentStep(AppState.DO_NOT_INVEST);
-    else if (currentStep === AppState.DO_NOT_INVEST) setCurrentStep(AppState.BUDDY_INTRO);
-    else if (currentStep === AppState.BUDDY_INTRO) setCurrentStep(AppState.ASK_NAME);
-    else if (currentStep === AppState.ASK_NAME) setCurrentStep(AppState.AGE_CONFIRM);
-    else if (currentStep === AppState.INVESTED_BEFORE) setCurrentStep(AppState.FUTURE_GOALS);
-    else if (currentStep === AppState.FUTURE_GOALS) setCurrentStep(AppState.SELECTED_GOALS);
-    else if (currentStep === AppState.SELECTED_GOALS) setCurrentStep(AppState.HELP_OPTIONS);
-    else if (currentStep === AppState.HELP_OPTIONS) setCurrentStep(AppState.SELECTED_HELP_OPTIONS);
-    else if (currentStep === AppState.SELECTED_HELP_OPTIONS) setCurrentStep(AppState.INVESTING_STATUS);
-    else if (currentStep === AppState.INVESTING_STATUS) setCurrentStep(AppState.INVESTING_BENEFIT);
-    else if (currentStep === AppState.INVESTING_BENEFIT) setCurrentStep(AppState.INVESTMENT_DURATION);
-    else if (currentStep === AppState.INVESTMENT_DURATION) setCurrentStep(AppState.RISK_TOLERANCE);
-    else if (currentStep === AppState.RISK_TOLERANCE) setCurrentStep(AppState.FINALIZE_PLAN);
-    else if (currentStep === AppState.FINALIZE_PLAN) setCurrentStep(AppState.BUDDY_CELEBRATE);
-    else if (currentStep === AppState.BUDDY_CELEBRATE) setCurrentStep(AppState.SIGNUP);
-    else if (currentStep === AppState.SIGNUP) setCurrentStep(AppState.VERIFY_EMAIL_OTP);
-    else if (currentStep === AppState.LOGIN_EMAIL) setCurrentStep(AppState.VERIFY_EMAIL_OTP);
+    setCurrentStep(prev => (prev + 1) as AppState);
   };
 
   const handleAgeConfirm = (isOver18: boolean) => {
@@ -94,6 +52,11 @@ export default function App() {
   const handleBackToLanding = () => setCurrentStep(AppState.LANDING);
   const handleChangeEmail = () => setCurrentStep(AppState.SIGNUP);
 
+  const handleAnalysisComplete = (plan: InvestmentPlan) => {
+    setGeneratedPlan(plan);
+    setCurrentStep(AppState.DASHBOARD);
+  };
+
   const handleInvestedBeforeSelection = (hasInvested: boolean) => {
     setHasInvestedBefore(hasInvested);
     setValue('investmentExperience', hasInvested ? 'investing' : 'never_started');
@@ -103,21 +66,16 @@ export default function App() {
   const handleFutureGoalsSelection = (goals: string[]) => {
     setUserGoals(goals);
     setValue('futureGoals', goals);
-    if (goals.length > 0) setValue('firstFutureGoal', goals[0]);
     handleNext();
   };
   
   const handleInvestingStatusSelection = (status: string[]) => {
-    setUserInvestingStatus(status);
     setValue('selectedInvestingStatus', status);
-    if (status.length > 0) setValue('firstInvestingSelection', status[0]);
     handleNext();
   };
   
   const handleHelpOptionsSelection = (options: string[]) => {
-    setUserHelpOptions(options);
     setValue('selectedHelpOptions', options);
-    if (options.length > 0) setValue('firstHelpSelection', options[0]);
     handleNext();
   };
 
@@ -131,34 +89,62 @@ export default function App() {
     handleNext();
   };
 
-  const handleJumpToStep = (step: number) => {
-    if (step >= 1 && step <= 5) setCurrentStep(step);
+  const getUserProfile = (): UserProfile => {
+    const state = getOnboardingState();
+    return {
+      name: state.firstName || 'Friend',
+      ageRange: '18-25',
+      occupation: 'Investor',
+      financialGoals: state.futureGoals || [],
+      investmentInterests: state.selectedHelpOptions || [],
+      motivation: state.investmentExperience === 'investing' ? 'Grow wealth further' : 'Start investing journey',
+      riskAppetite: (state.riskTolerance === 'high' ? 'High' : state.riskTolerance === 'low' ? 'Low' : 'Medium') as 'Low' | 'Medium' | 'High',
+      riskProfile: calculateRiskProfile()
+    };
   };
 
   return (
     <div className="h-screen w-full font-sans text-gray-900 bg-[#fff7ed] overflow-hidden">
-      {currentStep === AppState.LANDING && <WelcomeScreen onGetStarted={handleNext} onJumpToStep={handleJumpToStep} onLogin={handleLogin} />}
-      {currentStep === AppState.PROJECTION && <InvestmentProjectionScreen onContinue={handleNext} onJumpToStep={handleJumpToStep} onLogin={handleLogin} />}
-      {currentStep === AppState.AUTOMATED_UPDATE && <AutomatedUpdateScreen onContinue={handleNext} onJumpToStep={handleJumpToStep} onLogin={handleLogin} />}
-      {currentStep === AppState.DO_NOT_INVEST && <DoNotInvestScreen onContinue={handleNext} onJumpToStep={handleJumpToStep} onLogin={handleLogin} />}
-      {currentStep === AppState.BUDDY_INTRO && <BuddyIntroScreen onContinue={handleNext} onJumpToStep={handleJumpToStep} />}
+      {currentStep === AppState.LANDING && <WelcomeScreen onGetStarted={handleNext} onJumpToStep={(s) => setCurrentStep(s as AppState)} onLogin={handleLogin} />}
+      {currentStep === AppState.PROJECTION && <InvestmentProjectionScreen onContinue={handleNext} onJumpToStep={(s) => setCurrentStep(s as AppState)} onLogin={handleLogin} />}
+      {currentStep === AppState.AUTOMATED_UPDATE && <AutomatedUpdateScreen onContinue={handleNext} onJumpToStep={(s) => setCurrentStep(s as AppState)} onLogin={handleLogin} />}
+      {currentStep === AppState.DO_NOT_INVEST && <DoNotInvestScreen onContinue={handleNext} onJumpToStep={(s) => setCurrentStep(s as AppState)} onLogin={handleLogin} />}
+      {currentStep === AppState.BUDDY_INTRO && <BuddyIntroScreen onContinue={handleNext} onJumpToStep={(s) => setCurrentStep(s as AppState)} />}
+      
+      {/* Step 1: Basic Identity */}
       {currentStep === AppState.ASK_NAME && <AskNameScreen onContinue={handleNext} />}
       {currentStep === AppState.AGE_CONFIRM && <AgeConfirmScreen onConfirm={handleAgeConfirm} />}
       {currentStep === AppState.UNDERAGE && <UnderageScreen />}
+
+      {/* Step 2: Experience & Goals */}
       {currentStep === AppState.INVESTED_BEFORE && <InvestedBeforeScreen onContinue={handleInvestedBeforeSelection} />}
       {currentStep === AppState.FUTURE_GOALS && <FutureGoalsScreen hasInvestedBefore={hasInvestedBefore} onContinue={handleFutureGoalsSelection} />}
       {currentStep === AppState.SELECTED_GOALS && <SelectedGoalsScreen selectedGoalIds={userGoals} onContinue={handleNext} />}
+
+      {/* Step 3: Needs & Habits */}
       {currentStep === AppState.HELP_OPTIONS && <HelpOptionsScreen onContinue={handleHelpOptionsSelection} />}
-      {currentStep === AppState.SELECTED_HELP_OPTIONS && <SelectedHelpOptionsScreen selectedHelpOptions={userHelpOptions} onContinue={handleNext} />}
+      {currentStep === AppState.SELECTED_HELP_OPTIONS && <SelectedHelpOptionsScreen selectedHelpOptions={getOnboardingState().selectedHelpOptions} onContinue={handleNext} />}
       {currentStep === AppState.INVESTING_STATUS && <InvestingStatusScreen onContinue={handleInvestingStatusSelection} />}
+
+      {/* Step 4: Financial Profile (Risk Quiz) */}
       {currentStep === AppState.INVESTING_BENEFIT && <InvestingBenefitScreen onContinue={handleNext} />}
       {currentStep === AppState.INVESTMENT_DURATION && <InvestmentDurationScreen onContinue={handleDurationSelection} />}
       {currentStep === AppState.RISK_TOLERANCE && <RiskToleranceScreen onContinue={handleRiskSelection} />}
       {currentStep === AppState.FINALIZE_PLAN && <FinalizePlanScreen onContinue={handleNext} />}
       {currentStep === AppState.BUDDY_CELEBRATE && <BuddyCelebrateScreen onContinue={handleNext} />}
+
+      {/* Step 5: Account Creation */}
       {currentStep === AppState.SIGNUP && <SignupScreen onContinue={handleNext} />}
       {currentStep === AppState.VERIFY_EMAIL_OTP && <VerifyEmailOtpScreen onVerifySuccess={handleNext} onChangeEmail={handleChangeEmail} />}
       {currentStep === AppState.LOGIN_EMAIL && <LoginEmailScreen onBack={handleBackToLanding} onContinue={handleNext} />}
+
+      {/* Post-Account: Analysis & Dashboard */}
+      {currentStep === AppState.ANALYZING && <AnalyzingScreen onComplete={handleAnalysisComplete} />}
+      {currentStep === AppState.DASHBOARD && generatedPlan && (
+        <div className="h-full overflow-y-auto bg-white">
+            <Dashboard plan={generatedPlan} user={getUserProfile()} onReset={() => setCurrentStep(AppState.LANDING)} />
+        </div>
+      )}
     </div>
   );
 }
