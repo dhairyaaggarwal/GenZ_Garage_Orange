@@ -66,11 +66,15 @@ export const DoNotInvestScreen: React.FC<DoNotInvestScreenProps> = ({ onContinue
           
           <p className="text-xl text-gray-800 font-medium mb-12 text-center">We’ll do it for you</p>
 
-          {/* Credibility Tags - Moved down and text updated */}
-          <div className="flex flex-col gap-4 w-full max-w-sm mb-12 mt-8">
+          {/* Credibility Tags */}
+          <div className="flex flex-col gap-4 w-full max-w-xs mb-12">
              <div className="flex items-center justify-center gap-3 bg-white/40 backdrop-blur-md py-3 px-6 rounded-2xl border border-white/50 shadow-sm hover:bg-white/50 transition-colors">
                 <Award className="w-5 h-5 text-orange-600" />
-                <span className="font-semibold text-gray-800 text-sm whitespace-nowrap">For Beginners, GenZ and Women</span>
+                <span className="font-semibold text-gray-800 text-sm">Trusted by beginners</span>
+             </div>
+             <div className="flex items-center justify-center gap-3 bg-white/40 backdrop-blur-md py-3 px-6 rounded-2xl border border-white/50 shadow-sm hover:bg-white/50 transition-colors">
+                <Award className="w-5 h-5 text-orange-600" />
+                <span className="font-semibold text-gray-800 text-sm">100+ Happy Investors</span>
              </div>
           </div>
        </div>

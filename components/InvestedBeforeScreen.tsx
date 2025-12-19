@@ -5,7 +5,6 @@ interface InvestedBeforeScreenProps {
   onContinue: (hasInvested: boolean) => void;
 }
 
-// Using "Rachel" - High energy, clear
 const ELEVEN_LABS_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"; 
 const VOICE_TEXT = "Have you invested before?";
 
@@ -13,7 +12,6 @@ export const InvestedBeforeScreen: React.FC<InvestedBeforeScreenProps> = ({ onCo
   const [isPlaying, setIsPlaying] = useState(false);
   const hasPlayedRef = useRef(false);
 
-  // --- Voice Logic (Audio Only) ---
   const playVoice = async () => {
     if (hasPlayedRef.current) return;
     hasPlayedRef.current = true;
@@ -47,7 +45,6 @@ export const InvestedBeforeScreen: React.FC<InvestedBeforeScreenProps> = ({ onCo
     }
 
     if (!audio) {
-      // Fallback
       const utterance = new SpeechSynthesisUtterance(VOICE_TEXT);
       const voices = window.speechSynthesis.getVoices();
       const naturalVoice = voices.find(v => v.name.includes("Natural") || v.name.includes("Google US English"));
@@ -71,7 +68,6 @@ export const InvestedBeforeScreen: React.FC<InvestedBeforeScreenProps> = ({ onCo
   }, []);
 
   const handleSelection = (value: boolean) => {
-    // Stop audio on interaction
     window.speechSynthesis.cancel();
     setIsPlaying(false);
     onContinue(value);
@@ -79,22 +75,12 @@ export const InvestedBeforeScreen: React.FC<InvestedBeforeScreenProps> = ({ onCo
 
   return (
     <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-gradient-to-br from-orange-400 via-rose-300 to-orange-200 font-sans">
-      
-      {/* Background elements - No particles, just gradient */}
       <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
-      
-      {/* Header with Circular Progress (Step 1 of 4) */}
-      <CircularHeader currentStep={1} totalSteps={4} />
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-6">
-         
-         {/* Title */}
+      <CircularHeader currentStep={2} totalSteps={5} />
+      <div className="flex-1 flex flex-col items-center justify-center px-6 z-10 w-full max-w-md mx-auto -mt-10">
          <h1 className="text-4xl text-gray-900 text-center mb-2 leading-tight drop-shadow-sm">
            <span className="font-bold">Have you</span> <br/> <span className="italic font-serif">invested before?</span>
          </h1>
-
-         {/* Voice Activity Indicator - Shows ONLY when speaking */}
          <div className="h-8 mb-2 flex items-center justify-center">
             {isPlaying && (
               <div className="flex items-end gap-1 h-4">
@@ -105,29 +91,17 @@ export const InvestedBeforeScreen: React.FC<InvestedBeforeScreenProps> = ({ onCo
               </div>
             )}
          </div>
-
-         {/* Static Helper Text */}
          <p className="text-orange-900/60 text-sm font-medium tracking-wide uppercase mb-8">Select one option</p>
-
-         {/* Options */}
          <div className="w-full space-y-4">
-           <button 
-             onClick={() => handleSelection(true)}
-             className="w-full bg-white/80 backdrop-blur-md border-2 border-white hover:border-orange-400 p-6 rounded-[2rem] flex items-center justify-between group transition-all duration-200 shadow-lg shadow-orange-900/5 hover:scale-[1.02] active:scale-95"
-           >
+           <button onClick={() => handleSelection(true)} className="w-full bg-white/80 backdrop-blur-md border-2 border-white hover:border-orange-400 p-6 rounded-[2rem] flex items-center justify-between group transition-all duration-200 shadow-lg shadow-orange-900/5 hover:scale-[1.02] active:scale-95">
              <span className="text-2xl font-bold text-gray-800">Yes</span>
              <span className="text-3xl filter drop-shadow-sm">✅</span>
            </button>
-
-           <button 
-             onClick={() => handleSelection(false)}
-             className="w-full bg-white/80 backdrop-blur-md border-2 border-white hover:border-orange-400 p-6 rounded-[2rem] flex items-center justify-between group transition-all duration-200 shadow-lg shadow-orange-900/5 hover:scale-[1.02] active:scale-95"
-           >
+           <button onClick={() => handleSelection(false)} className="w-full bg-white/80 backdrop-blur-md border-2 border-white hover:border-orange-400 p-6 rounded-[2rem] flex items-center justify-between group transition-all duration-200 shadow-lg shadow-orange-900/5 hover:scale-[1.02] active:scale-95">
              <span className="text-2xl font-bold text-gray-800">No</span>
              <span className="text-3xl filter drop-shadow-sm">⛔️</span>
            </button>
          </div>
-
       </div>
     </div>
   );

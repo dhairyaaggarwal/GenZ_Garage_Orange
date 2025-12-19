@@ -113,7 +113,7 @@ export const SelectedHelpOptionsScreen: React.FC<SelectedHelpOptionsScreenProps>
       <CircularHeader currentStep={3} totalSteps={4} />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-6 overflow-y-auto no-scrollbar pb-32">
+      <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-2 overflow-y-auto no-scrollbar pb-32">
          
          {/* Title */}
          <h1 className="text-3xl font-bold text-gray-900 text-center mb-6 leading-tight drop-shadow-sm">

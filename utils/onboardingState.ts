@@ -1,17 +1,4 @@
 
-export interface UserPlaylist {
-  id: string;
-  title: string;
-  subtitle: string;
-  badge?: string;
-  emoji: string;
-  color: string;
-  iconColor: string;
-  trend: string; // Kept for compatibility with detail screen type, even if hidden on card
-  details: any; // Stores the specific holdings/returns for this playlist
-  createdAt: number;
-}
-
 export interface OnboardingState {
   firstName: string | null;
   investmentExperience: string | null;
@@ -19,22 +6,15 @@ export interface OnboardingState {
   futureGoals: string[];
   firstFutureGoal: string | null;
   riskTolerance: string | null;
-  annualIncomeBracket: string | null;
   selectedHelpOptions: string[];
   firstHelpSelection: string | null;
   selectedInvestingStatus: string[];
   firstInvestingSelection: string | null;
-  stressedAboutMoney: boolean | null;
-  helpNeededWithInvesting: string | null;
   mobileNumber: string | null;
   email: string | null;
   mobileVerified?: boolean;
   emailVerified?: boolean;
   sessionToken?: string;
-  playlistInterests?: string[];
-  playlistCompanies?: string[];
-  playlistGoal?: string | null;
-  myPlaylists: UserPlaylist[];
 }
 
 const initialState: OnboardingState = {
@@ -44,22 +24,15 @@ const initialState: OnboardingState = {
   futureGoals: [],
   firstFutureGoal: null,
   riskTolerance: null,
-  annualIncomeBracket: null,
   selectedHelpOptions: [],
   firstHelpSelection: null,
   selectedInvestingStatus: [],
   firstInvestingSelection: null,
-  stressedAboutMoney: null,
-  helpNeededWithInvesting: null,
   mobileNumber: null,
   email: null,
   mobileVerified: false,
   emailVerified: false,
-  sessionToken: undefined,
-  playlistInterests: [],
-  playlistCompanies: [],
-  playlistGoal: null,
-  myPlaylists: []
+  sessionToken: undefined
 };
 
 export let onboardingState: OnboardingState = { ...initialState };
@@ -121,13 +94,4 @@ export function multiSelectToggle(arrayName: 'futureGoals' | 'selectedHelpOption
 export function setValue(key: keyof OnboardingState, value: any) {
   (onboardingState as any)[key] = value;
   persistOnboardingState();
-}
-
-export function addPlaylist(playlist: UserPlaylist) {
-  // Prevent duplicate adds if user clicks multiple times or navigates back
-  const exists = onboardingState.myPlaylists.some(p => p.id === playlist.id);
-  if (!exists) {
-    onboardingState.myPlaylists = [playlist, ...onboardingState.myPlaylists];
-    persistOnboardingState();
-  }
 }

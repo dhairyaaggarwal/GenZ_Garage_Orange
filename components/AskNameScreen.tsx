@@ -1,6 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './Button';
 import { CircularHeader } from './CircularHeader';
+import { Mic, Volume2 } from 'lucide-react';
 import { setValue, persistOnboardingState } from '../utils/onboardingState';
 
 interface AskNameScreenProps {
@@ -15,7 +16,6 @@ export const AskNameScreen: React.FC<AskNameScreenProps> = ({ onContinue }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // --- Voice Playback ---
   const playVoice = async () => {
     setIsPlaying(true);
     const apiKey = process.env.ELEVEN_LABS_API_KEY;
@@ -64,6 +64,19 @@ export const AskNameScreen: React.FC<AskNameScreenProps> = ({ onContinue }) => {
     return () => { window.speechSynthesis.cancel(); };
   }, []);
 
+  const startListening = () => {
+    if ('webkitSpeechRecognition' in window) {
+      const recognition = new (window as any).webkitSpeechRecognition();
+      recognition.lang = 'en-US';
+      recognition.start();
+      recognition.onresult = (event: any) => {
+        const transcript = event.results[0][0].transcript;
+        const firstName = transcript.split(' ')[0];
+        setName(firstName);
+      };
+    }
+  };
+
   const handleContinue = () => {
     if (name.trim()) {
       setValue('firstName', name.trim());
@@ -74,55 +87,11 @@ export const AskNameScreen: React.FC<AskNameScreenProps> = ({ onContinue }) => {
 
   return (
     <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-gradient-to-br from-orange-300 via-orange-200 to-rose-300 font-sans">
-      
-      {/* Animated Particles */}
-      <div className="absolute inset-0 pointer-events-none">
-         {[...Array(6)].map((_, i) => (
-            <div 
-              key={i}
-              className="absolute bg-white/40 rounded-full blur-[1px] animate-[float_4s_ease-in-out_infinite]"
-              style={{
-                width: Math.random() * 6 + 2 + 'px',
-                height: Math.random() * 6 + 2 + 'px',
-                left: Math.random() * 100 + '%',
-                top: Math.random() * 100 + '%',
-                animationDelay: Math.random() * 2 + 's',
-                animationDuration: Math.random() * 3 + 4 + 's'
-              }}
-            />
-         ))}
-      </div>
-      <style>{`
-        @keyframes float {
-          0% { transform: translateY(0) translateX(0); opacity: 0; }
-          20% { opacity: 0.8; }
-          80% { opacity: 0.8; }
-          100% { transform: translateY(-40px) translateX(20px); opacity: 0; }
-        }
-      `}</style>
-
-      {/* Header */}
-      <CircularHeader currentStep={1} totalSteps={4} />
-
-      {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-6">
-         
+      <CircularHeader currentStep={1} totalSteps={5} />
+      <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-8">
          <h1 className="text-4xl text-gray-900 text-center mb-10 leading-tight drop-shadow-sm">
            <span className="font-bold">What's your</span> <br/> <span className="italic font-serif font-light text-gray-800">first name?</span>
          </h1>
-
-         {/* Visual Indicator of Voice Activity */}
-         <div className="h-6 mb-4 flex items-center justify-center min-h-[24px]">
-            {isPlaying && (
-              <div className="flex items-end gap-1 h-4 transition-opacity duration-300">
-                 <div className="w-1 bg-white rounded-full animate-[bounce_1s_infinite]"></div>
-                 <div className="w-1 bg-white rounded-full animate-[bounce_1s_infinite_0.1s] h-full"></div>
-                 <div className="w-1 bg-white rounded-full animate-[bounce_1s_infinite_0.2s]"></div>
-                 <div className="w-1 bg-white rounded-full animate-[bounce_1s_infinite_0.3s] h-3/4"></div>
-              </div>
-            )}
-         </div>
-
          <div className="w-[85%] relative mb-6">
             <input
               ref={inputRef}
@@ -133,17 +102,19 @@ export const AskNameScreen: React.FC<AskNameScreenProps> = ({ onContinue }) => {
               autoFocus
               className="w-full bg-white/90 backdrop-blur-md px-6 py-4 rounded-full text-xl text-gray-900 placeholder-gray-400 border-2 border-transparent focus:border-orange-400 focus:outline-none shadow-lg shadow-orange-900/5 transition-all text-center"
             />
+            <button onClick={startListening} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-600 transition-colors p-2">
+              <Mic size={20} />
+            </button>
          </div>
-
+         <div className="flex items-center gap-2 text-gray-800/60 font-medium text-sm">
+            <span>To get started, what’s your first name?</span>
+            <button onClick={playVoice} className={`${isPlaying ? 'text-orange-600' : 'text-gray-500 hover:text-orange-600'}`}>
+               <Volume2 size={16} className={isPlaying ? 'animate-pulse' : ''} />
+            </button>
+         </div>
       </div>
-
-      {/* Bottom CTA */}
       <div className="pb-10 px-6 w-full flex justify-center z-20">
-         <Button 
-           onClick={handleContinue}
-           disabled={!name.trim()}
-           className="w-[85%] rounded-full py-4 text-lg hover:scale-[1.02] transition-transform shadow-xl shadow-orange-500/20 bg-gradient-to-r from-orange-500 to-yellow-500 text-gray-900 font-bold border-none disabled:opacity-50 disabled:cursor-not-allowed"
-         >
+         <Button onClick={handleContinue} disabled={!name.trim()} className="w-[85%] rounded-full py-4 text-lg hover:scale-[1.02] transition-transform shadow-xl shadow-orange-500/20 bg-gradient-to-r from-orange-500 to-yellow-500 text-gray-900 font-bold border-none disabled:opacity-50 disabled:cursor-not-allowed">
            Continue
          </Button>
       </div>

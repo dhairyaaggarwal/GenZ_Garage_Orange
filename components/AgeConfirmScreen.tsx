@@ -12,7 +12,6 @@ const VOICE_TEXT = "Nice to meet ya! Are you older than 18? This is the legal ag
 export const AgeConfirmScreen: React.FC<AgeConfirmScreenProps> = ({ onConfirm }) => {
   const [isPlaying, setIsPlaying] = useState(false);
 
-  // --- Voice Playback ---
   const playVoice = async () => {
     setIsPlaying(true);
     const apiKey = process.env.ELEVEN_LABS_API_KEY;
@@ -69,50 +68,29 @@ export const AgeConfirmScreen: React.FC<AgeConfirmScreenProps> = ({ onConfirm })
 
   return (
     <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-gradient-to-br from-orange-400 via-rose-300 to-orange-200 font-sans">
-      
-      {/* Background - Clean */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
-
-      {/* Header */}
-      <CircularHeader currentStep={2} totalSteps={4} />
-
-      {/* Main Content */}
+      <CircularHeader currentStep={1} totalSteps={5} />
       <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-6">
-         
-         <h1 className="text-3xl md:text-4xl text-gray-900 text-center mb-12 leading-tight drop-shadow-sm">
-           <span className="font-bold">Are you</span> <span className="italic font-serif font-light">over 18?</span>
+         <h1 className="text-4xl text-gray-900 text-center mb-6 leading-tight drop-shadow-sm">
+           <span className="font-bold">Are you</span> <br/> <span className="italic font-serif font-light">over 18?</span>
          </h1>
-
-         {/* Voice Activity Indicator (Optional visual cue since text was removed) */}
-         <div className="h-8 mb-4 flex items-center justify-center min-h-[32px]">
-            {isPlaying && (
-              <div className="flex items-end gap-1 h-4 transition-opacity duration-300">
-                 <div className="w-1 bg-yellow-300 rounded-full animate-[bounce_1s_infinite]"></div>
-                 <div className="w-1 bg-yellow-300 rounded-full animate-[bounce_1s_infinite_0.1s] h-full"></div>
-                 <div className="w-1 bg-yellow-300 rounded-full animate-[bounce_1s_infinite_0.2s]"></div>
-                 <div className="w-1 bg-yellow-300 rounded-full animate-[bounce_1s_infinite_0.3s] h-3/4"></div>
-              </div>
-            )}
+         <div className={`mb-10 text-center transition-all duration-300 ${isPlaying ? 'opacity-100 scale-100' : 'opacity-0 scale-95'}`}>
+             <span className="relative inline-block px-3 py-1">
+                 <span className="absolute inset-0 bg-yellow-300/60 rounded-lg blur-sm animate-pulse"></span>
+                 <span className="relative z-10 text-sm font-medium text-gray-900 leading-relaxed">
+                   Nice to meet ya! Are you older than 18? <br/> This is the legal age to start investing.
+                 </span>
+             </span>
          </div>
-
          <div className="w-full space-y-4">
-           <button 
-             onClick={() => handleSelection(true)}
-             className="w-full bg-white/80 backdrop-blur-md border-2 border-white hover:border-orange-400 p-6 rounded-[2rem] flex items-center justify-between group transition-all duration-200 shadow-lg shadow-orange-900/5 hover:scale-[1.02] active:scale-95"
-           >
+           <button onClick={() => handleSelection(true)} className="w-full bg-white/80 backdrop-blur-md border-2 border-white hover:border-orange-400 p-6 rounded-[2rem] flex items-center justify-between group transition-all duration-200 shadow-lg shadow-orange-900/5 hover:scale-[1.02] active:scale-95">
              <span className="text-2xl font-bold text-gray-800">Yes</span>
              <span className="text-3xl filter drop-shadow-sm">✅</span>
            </button>
-
-           <button 
-             onClick={() => handleSelection(false)}
-             className="w-full bg-white/80 backdrop-blur-md border-2 border-white hover:border-orange-400 p-6 rounded-[2rem] flex items-center justify-between group transition-all duration-200 shadow-lg shadow-orange-900/5 hover:scale-[1.02] active:scale-95"
-           >
+           <button onClick={() => handleSelection(false)} className="w-full bg-white/80 backdrop-blur-md border-2 border-white hover:border-orange-400 p-6 rounded-[2rem] flex items-center justify-between group transition-all duration-200 shadow-lg shadow-orange-900/5 hover:scale-[1.02] active:scale-95">
              <span className="text-2xl font-bold text-gray-800">No</span>
              <span className="text-3xl filter drop-shadow-sm">⛔️</span>
            </button>
          </div>
-
       </div>
     </div>
   );

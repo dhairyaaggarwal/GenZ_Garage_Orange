@@ -106,10 +106,10 @@ export const HelpOptionsScreen: React.FC<HelpOptionsScreenProps> = ({ onContinue
       <CircularHeader currentStep={3} totalSteps={4} />
 
       {/* Main Content */}
-      <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-6 overflow-y-auto no-scrollbar pb-32">
+      <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto overflow-y-auto no-scrollbar pb-32">
          
          {/* Title */}
-         <h1 className="text-4xl text-gray-900 text-center mb-6 leading-tight drop-shadow-sm">
+         <h1 className="text-4xl text-gray-900 text-center mb-6 leading-tight drop-shadow-sm mt-4">
            <span className="font-bold">How can we help</span> <br/> <span className="italic font-serif">achieve your goals?</span>
          </h1>
 
