@@ -3,90 +3,89 @@ import React, { useEffect, useState } from 'react';
 import { generateInvestmentPlan } from '../services/geminiService';
 import { getOnboardingState, calculateRiskProfile } from '../utils/onboardingState';
 import { InvestmentPlan, UserProfile } from '../types';
-import { Loader2, Sparkles } from 'lucide-react';
+import { Loader2, Sparkles, ShieldCheck, Heart } from 'lucide-react';
 
 interface AnalyzingScreenProps {
   onComplete: (plan: InvestmentPlan) => void;
 }
 
 const MESSAGES = [
-    "Crunching the numbers...",
-    "Reviewing your goals...",
-    "Matching with top Indian funds...",
-    "Optimizing for your risk level...",
-    "Buddy is putting it all together...",
-    "Almost there! Just a few more seconds."
+    "Crunching numbers...",
+    "Reviewing your dreams...",
+    "Finding top Indian funds...",
+    "Matching with SEBI regulated leaders...",
+    "Ensuring your money stays safe...",
+    "Buddy is personalizing your mix...",
+    "Almost there, superstar!"
 ];
 
 export const AnalyzingScreen: React.FC<AnalyzingScreenProps> = ({ onComplete }) => {
   const [currentMessage, setCurrentMessage] = useState(0);
 
   useEffect(() => {
-    const messageInterval = setInterval(() => {
+    const interval = setInterval(() => {
         setCurrentMessage(prev => (prev + 1) % MESSAGES.length);
     }, 2500);
 
     const startAnalysis = async () => {
         const state = getOnboardingState();
-        const calculatedRisk = calculateRiskProfile();
-        
         const profile: UserProfile = {
-            name: state.firstName || 'Friend',
-            ageRange: '18-25',
-            occupation: 'Beginner Investor',
-            financialGoals: state.futureGoals || [],
-            investmentInterests: state.selectedHelpOptions || [],
-            motivation: state.investmentExperience === 'investing' ? 'Grow wealth further' : 'Start investing journey',
-            riskAppetite: (state.riskTolerance === 'high' ? 'High' : state.riskTolerance === 'low' ? 'Low' : 'Medium') as 'Low' | 'Medium' | 'High',
-            riskProfile: calculatedRisk
+            name: state.first_name || 'Friend',
+            financialGoals: state.future_goals || [],
+            investmentInterests: state.investment_needs || [],
+            riskProfile: calculateRiskProfile()
         };
 
         try {
             const plan = await generateInvestmentPlan(profile);
             onComplete(plan);
         } catch (error) {
-            console.error("Analysis failed", error);
             onComplete({
-                allocations: [
-                    // Fix: Use equity_display and debt_display instead of equity and debt
-                    { assetClass: 'Equity (Stock Funds)', percentage: calculatedRisk.equity_display, color: '#f97316' }, 
-                    { assetClass: 'Fixed Income (Safe)', percentage: calculatedRisk.debt_display, color: '#fbbf24' },
-                    { assetClass: 'Others', percentage: 100 - calculatedRisk.equity_display - calculatedRisk.debt_display, color: '#94a3b8' }
-                ],
-                summary: `The ${calculatedRisk.type.toLowerCase()} Starter`,
-                rationale: `We hit a small snag, but based on your risk score of ${calculatedRisk.score}, this ${calculatedRisk.type} plan is perfect for your goals.`,
-                firstSteps: ["Download an investment app", "Complete your KYC", "Start a ₹500 SIP"]
+                allocations: [{ assetClass: 'Equity', percentage: 70, color: '#9B7EEC' }],
+                summary: 'Growth Plan',
+                rationale: 'Diversified for growth.',
+                firstSteps: ['KYC', 'SIP'],
+                expectedReturn: '10%',
+                riskLevel: 'Moderate'
             });
         }
     };
 
     startAnalysis();
-
-    return () => clearInterval(messageInterval);
-  }, [onComplete]);
+    return () => clearInterval(interval);
+  }, []);
 
   return (
-    <div className="h-full flex flex-col items-center justify-center bg-gradient-to-br from-orange-50 to-orange-200 px-6 text-center">
-      <div className="relative mb-12">
-        <div className="w-32 h-32 rounded-full bg-orange-500/20 animate-ping absolute top-0 left-0"></div>
-        <div className="w-32 h-32 rounded-full bg-orange-100 flex items-center justify-center relative z-10 shadow-xl">
-           <Loader2 className="w-16 h-16 text-orange-500 animate-spin" />
+    <div className="h-full flex flex-col items-center justify-center bg-brand-bg px-6 text-center">
+      <div className="relative mb-16 scale-110">
+        <div className="w-40 h-40 rounded-full bg-brand-secondary/10 animate-pulse absolute top-0 left-0"></div>
+        <div className="w-40 h-40 rounded-full bg-white border-4 border-brand-card flex items-center justify-center relative z-10 shadow-2xl">
+           <Loader2 className="w-20 h-20 text-brand-secondary animate-spin" />
         </div>
-        <div className="absolute -top-2 -right-2 bg-yellow-400 p-2 rounded-full shadow-lg animate-bounce">
-            <Sparkles className="w-6 h-6 text-gray-900" />
+        <div className="absolute -top-4 -right-4 bg-brand-primary p-3 rounded-full shadow-lg animate-bounce">
+            <Sparkles className="w-8 h-8 text-brand-text" />
+        </div>
+        <div className="absolute -bottom-4 -left-4 bg-white p-2 rounded-full shadow-md">
+            <ShieldCheck className="w-6 h-6 text-brand-success" />
         </div>
       </div>
       
-      <h1 className="text-3xl font-bold text-gray-900 mb-4 animate-pulse">
-        Creating Your Strategy
+      <h1 className="text-4xl font-black text-brand-text mb-6 tracking-tight">
+        Buddy is <span className="text-brand-secondary">Thinking...</span>
       </h1>
       
-      <p className="text-xl text-gray-700 font-medium h-12 transition-all duration-500">
+      <p className="text-xl text-brand-subtext font-bold h-16 max-w-xs mx-auto">
         {MESSAGES[currentMessage]}
       </p>
 
-      <div className="mt-20 w-full max-w-xs h-1.5 bg-gray-200 rounded-full overflow-hidden">
-        <div className="h-full bg-orange-500 animate-[loading_10s_linear_infinite]"></div>
+      <div className="mt-20 w-full max-w-xs h-3 bg-white/50 rounded-full overflow-hidden border border-brand-card">
+        <div className="h-full bg-brand-secondary animate-[loading_8s_linear_infinite]"></div>
+      </div>
+
+      {/* Increased contrast for readability */}
+      <div className="mt-12 flex items-center gap-2 text-[14px] font-black uppercase tracking-widest text-[#1F1F1F]">
+        <Heart size={18} className="text-[#9B7EEC] fill-[#9B7EEC]" />
+        <span>Made by GenZ for the GenZ xoxo</span>
       </div>
 
       <style>{`

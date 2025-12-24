@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './Button';
 import { CircularHeader } from './CircularHeader';
@@ -6,19 +7,21 @@ import { setValue, persistOnboardingState } from '../utils/onboardingState';
 
 interface AskNameScreenProps {
   onContinue: () => void;
+  onJumpToStep?: (step: number) => void;
 }
 
+const VOICE_TEXT = "I am so excited to help you! To get us moving, what’s your first name?";
 const ELEVEN_LABS_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"; 
-const VOICE_TEXT = "To get started, what’s your first name?";
 
-export const AskNameScreen: React.FC<AskNameScreenProps> = ({ onContinue }) => {
+export const AskNameScreen: React.FC<AskNameScreenProps> = ({ onContinue, onJumpToStep }) => {
   const [name, setName] = useState('');
   const [isPlaying, setIsPlaying] = useState(false);
   const inputRef = useRef<HTMLInputElement>(null);
+  const hasPlayedRef = useRef(false);
 
   const playVoice = async () => {
     setIsPlaying(true);
-    const apiKey = process.env.ELEVEN_LABS_API_KEY;
+    const apiKey = (window as any).ELEVEN_LABS_API_KEY || process.env.ELEVEN_LABS_API_KEY;
     let audio: HTMLAudioElement | null = null;
 
     if (apiKey) {
@@ -47,10 +50,8 @@ export const AskNameScreen: React.FC<AskNameScreenProps> = ({ onContinue }) => {
 
     if (!audio) {
       const utterance = new SpeechSynthesisUtterance(VOICE_TEXT);
-      const voices = window.speechSynthesis.getVoices();
-      const naturalVoice = voices.find(v => v.name.includes("Natural") || v.name.includes("Google US English"));
-      if (naturalVoice) utterance.voice = naturalVoice;
-      utterance.rate = 1.1;
+      utterance.rate = 1.15; 
+      utterance.pitch = 1.1;
       utterance.onend = () => setIsPlaying(false);
       window.speechSynthesis.speak(utterance);
     } else {
@@ -60,61 +61,64 @@ export const AskNameScreen: React.FC<AskNameScreenProps> = ({ onContinue }) => {
   };
 
   useEffect(() => {
-    setTimeout(playVoice, 500);
-    return () => { window.speechSynthesis.cancel(); };
-  }, []);
-
-  const startListening = () => {
-    if ('webkitSpeechRecognition' in window) {
-      const recognition = new (window as any).webkitSpeechRecognition();
-      recognition.lang = 'en-US';
-      recognition.start();
-      recognition.onresult = (event: any) => {
-        const transcript = event.results[0][0].transcript;
-        const firstName = transcript.split(' ')[0];
-        setName(firstName);
-      };
+    if (!hasPlayedRef.current) {
+      setTimeout(playVoice, 800);
+      hasPlayedRef.current = true;
     }
-  };
+    return () => window.speechSynthesis.cancel();
+  }, []);
 
   const handleContinue = () => {
     if (name.trim()) {
-      setValue('firstName', name.trim());
+      setValue('first_name', name.trim());
       persistOnboardingState();
+      window.speechSynthesis.cancel();
       onContinue();
     }
   };
 
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const filteredValue = e.target.value.replace(/[^a-zA-Z\s]/g, '');
+    setName(filteredValue);
+  };
+
   return (
-    <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-gradient-to-br from-orange-300 via-orange-200 to-rose-300 font-sans">
-      <CircularHeader currentStep={1} totalSteps={5} />
-      <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-8">
-         <h1 className="text-4xl text-gray-900 text-center mb-10 leading-tight drop-shadow-sm">
-           <span className="font-bold">What's your</span> <br/> <span className="italic font-serif font-light text-gray-800">first name?</span>
+    <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-brand-bg font-sans">
+      <CircularHeader currentStep={1} totalSteps={5} onJumpToStep={onJumpToStep} />
+      <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-12">
+         <h1 className="text-4xl text-brand-text text-center font-black mb-12 leading-tight tracking-tight">
+           What's your <br/> <span className="italic text-brand-secondary font-serif">first name?</span>
          </h1>
-         <div className="w-[85%] relative mb-6">
+         <div className="w-full relative mb-8">
             <input
               ref={inputRef}
               type="text"
               value={name}
-              onChange={(e) => setName(e.target.value)}
-              placeholder="First name"
+              onChange={handleInputChange}
+              placeholder="E.g. Priya"
               autoFocus
-              className="w-full bg-white/90 backdrop-blur-md px-6 py-4 rounded-full text-xl text-gray-900 placeholder-gray-400 border-2 border-transparent focus:border-orange-400 focus:outline-none shadow-lg shadow-orange-900/5 transition-all text-center"
+              className="w-full bg-white px-8 py-5 rounded-[2.5rem] text-2xl text-brand-text placeholder-brand-muted border-2 border-brand-card focus:border-brand-secondary focus:outline-none transition-all text-center shadow-sm"
             />
-            <button onClick={startListening} className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-orange-600 transition-colors p-2">
-              <Mic size={20} />
+            <button className="absolute right-6 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-secondary p-2">
+              <Mic size={24} />
             </button>
          </div>
-         <div className="flex items-center gap-2 text-gray-800/60 font-medium text-sm">
-            <span>To get started, what’s your first name?</span>
-            <button onClick={playVoice} className={`${isPlaying ? 'text-orange-600' : 'text-gray-500 hover:text-orange-600'}`}>
-               <Volume2 size={16} className={isPlaying ? 'animate-pulse' : ''} />
+         <div className="flex items-center gap-3 text-brand-subtext font-bold text-sm bg-white/50 px-6 py-2.5 rounded-full border border-brand-card shadow-sm">
+            <span>Buddy wants to know!</span>
+            <button 
+              onClick={() => {
+                window.speechSynthesis.cancel();
+                playVoice();
+              }} 
+              className={`${isPlaying ? 'text-brand-secondary' : 'text-brand-muted hover:text-brand-text'} transition-colors`}
+              aria-label="Replay Buddy's voice"
+            >
+               <Volume2 size={22} className={isPlaying ? 'animate-pulse' : ''} />
             </button>
          </div>
       </div>
-      <div className="pb-10 px-6 w-full flex justify-center z-20">
-         <Button onClick={handleContinue} disabled={!name.trim()} className="w-[85%] rounded-full py-4 text-lg hover:scale-[1.02] transition-transform shadow-xl shadow-orange-500/20 bg-gradient-to-r from-orange-500 to-yellow-500 text-gray-900 font-bold border-none disabled:opacity-50 disabled:cursor-not-allowed">
+      <div className="pb-16 px-6 w-full flex justify-center z-20">
+         <Button onClick={handleContinue} disabled={!name.trim()} className="w-[85%] py-4 text-xl shadow-xl shadow-brand-primary/20">
            Continue
          </Button>
       </div>

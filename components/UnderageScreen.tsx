@@ -4,39 +4,33 @@ import { Button } from './Button';
 
 export const UnderageScreen: React.FC = () => {
   return (
-    <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-gradient-to-br from-orange-400 via-rose-300 to-orange-200 font-sans">
-      
-      {/* Background - Clean */}
-      <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
-
-      {/* Dimmed Header */}
-      <div className="opacity-50 pointer-events-none grayscale">
-        <CircularHeader currentStep={2} totalSteps={4} />
+    <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-brand-bg font-sans text-brand-text">
+      <div className="opacity-30 pointer-events-none">
+        <CircularHeader currentStep={1} totalSteps={5} />
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col items-center justify-center px-6 z-10 w-full max-w-md mx-auto text-center -mt-20">
-         
-         <h1 className="text-5xl font-extrabold text-gray-900 mb-6 drop-shadow-sm tracking-tight">
+         <div className="w-24 h-24 bg-brand-tertiary/20 rounded-full flex items-center justify-center mb-10 border-4 border-brand-tertiary shadow-lg animate-bounce">
+            <span className="text-5xl">🛑</span>
+         </div>
+         <h1 className="text-5xl font-black text-brand-text mb-6 tracking-tight">
            We’re sorry
          </h1>
-         
-         <p className="text-xl text-gray-800 font-medium leading-relaxed max-w-xs mx-auto">
-           You must be 18 years old or older to use Orange.
+         <p className="text-2xl text-brand-subtext font-medium leading-relaxed max-w-xs mx-auto">
+           You must be <span className="text-brand-text font-black border-b-4 border-brand-tertiary">18+</span> to use Orange.
            <br/><br/>
-           Hopefully we’ll see you back here soon.
+           See you when you turn 18!
          </p>
-
       </div>
 
-      {/* Bottom CTA */}
-      <div className="pb-10 px-6 w-full flex justify-center z-20">
-         <button 
+      <div className="pb-16 px-6 w-full flex justify-center z-20">
+         <Button 
+           variant="secondary"
            onClick={() => window.location.reload()}
-           className="text-gray-700 font-bold text-sm px-6 py-3 rounded-full border border-gray-400/50 hover:bg-white/20 transition-all"
+           className="w-[85%]"
          >
-           Exit
-         </button>
+           Exit App
+         </Button>
       </div>
     </div>
   );

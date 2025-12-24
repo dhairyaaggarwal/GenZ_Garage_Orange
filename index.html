@@ -1,26 +1,26 @@
+
 <!DOCTYPE html>
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Orange - Start Your Journey</title>
+    <title>Orange - Your Financial Buddy</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
             colors: {
-              orange: {
-                50: '#fff7ed',
-                100: '#ffedd5',
-                200: '#fed7aa',
-                300: '#fdba74',
-                400: '#fb923c',
-                500: '#f97316',
-                600: '#ea580c',
-                700: '#c2410c',
-                800: '#9a3412',
-                900: '#7c2d12',
+              brand: {
+                bg: '#E9DDF3',
+                card: '#D8C8EE',
+                primary: '#DFFF4F',    /* Lime */
+                secondary: '#9B7EEC',  /* Purple */
+                tertiary: '#FFB7A5',   /* Peach */
+                success: '#10B981',
+                text: '#1F1F1F',
+                subtext: '#5F5F73',
+                muted: '#9A9AB0',
               },
             },
             fontFamily: {
@@ -29,67 +29,68 @@
             animation: {
               blob: "blob 7s infinite",
               'gradient-xy': 'gradient-xy 6s ease infinite',
+              'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
             },
             keyframes: {
               blob: {
-                "0%": {
-                  transform: "translate(0px, 0px) scale(1)",
-                },
-                "33%": {
-                  transform: "translate(30px, -50px) scale(1.1)",
-                },
-                "66%": {
-                  transform: "translate(-20px, 20px) scale(0.9)",
-                },
-                "100%": {
-                  transform: "translate(0px, 0px) scale(1)",
-                },
+                "0%": { transform: "translate(0px, 0px) scale(1)" },
+                "33%": { transform: "translate(30px, -50px) scale(1.1)" },
+                "66%": { transform: "translate(-20px, 20px) scale(0.9)" },
+                "100%": { transform: "translate(0px, 0px) scale(1)" },
               },
               'gradient-xy': {
-                '0%, 100%': {
-                  'background-size': '200% 200%',
-                  'background-position': 'left top'
-                },
-                '50%': {
-                  'background-size': '200% 200%',
-                  'background-position': 'right bottom'
-                }
+                '0%, 100%': { 'background-size': '200% 200%', 'background-position': 'left top' },
+                '50%': { 'background-size': '200% 200%', 'background-position': 'right bottom' }
               }
             },
           },
         },
       }
     </script>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
       body {
         font-family: 'Inter', sans-serif;
-        background-color: #fff7ed; /* orange-50 */
+        background-color: #E9DDF3;
+        color: #1F1F1F;
       }
-      /* Custom scrollbar for clean look */
-      ::-webkit-scrollbar {
-        width: 8px;
+      ::-webkit-scrollbar { width: 6px; }
+      ::-webkit-scrollbar-track { background: #E9DDF3; }
+      ::-webkit-scrollbar-thumb { background: #9B7EEC; border-radius: 10px; }
+      
+      .option-card-default {
+        background: #FFFFFF;
+        border: 2px solid #D8C8EE;
+        transition: all 0.2s ease-in-out;
       }
-      ::-webkit-scrollbar-track {
-        background: transparent;
+      .option-card-selected {
+        background: #F5F2FF;
+        border: 2px solid #9B7EEC;
+        transform: scale(1.02);
       }
-      ::-webkit-scrollbar-thumb {
-        background: #fdba74;
-        border-radius: 4px;
+      .glass-card {
+        background: rgba(255, 255, 255, 0.6);
+        backdrop-filter: blur(12px);
+        border: 1px solid rgba(155, 126, 236, 0.2);
       }
-      ::-webkit-scrollbar-thumb:hover {
-        background: #f97316;
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+      
+      input[type=range].accent-brand-secondary::-webkit-slider-thumb {
+        background: #9B7EEC;
+        border: 4px solid #FFFFFF;
+        box-shadow: 0 4px 10px rgba(155, 126, 236, 0.3);
       }
     </style>
   <script type="importmap">
 {
   "imports": {
-    "lucide-react": "https://esm.sh/lucide-react@^0.560.0",
-    "recharts": "https://esm.sh/recharts@^3.5.1",
-    "react/": "https://esm.sh/react@^19.2.1/",
-    "react": "https://esm.sh/react@^19.2.1",
-    "@google/genai": "https://esm.sh/@google/genai@^1.33.0",
-    "react-dom/": "https://esm.sh/react-dom@^19.2.1/"
+    "recharts": "https://esm.sh/recharts@^3.6.0",
+    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
+    "react/": "https://esm.sh/react@^19.2.3/",
+    "react": "https://esm.sh/react@^19.2.3",
+    "lucide-react": "https://esm.sh/lucide-react@^0.562.0",
+    "@google/genai": "https://esm.sh/@google/genai@^1.34.0"
   }
 }
 </script>

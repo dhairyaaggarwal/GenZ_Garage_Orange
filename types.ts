@@ -1,30 +1,58 @@
+
 export type ProfileType = "CONSERVATIVE" | "MODERATE" | "BALANCED" | "GROWTH" | "AGGRESSIVE";
 
 export interface RiskProfileData {
   type: ProfileType;
   score: number;
+  risk_level: string;
+  equity_display: number;
   equity_min: number;
   equity_max: number;
-  equity_display: number;
+  debt_display: number;
   debt_min: number;
   debt_max: number;
-  debt_display: number;
   gold: number;
   cash: number;
-  returns: string;
-  risk_level: string;
-  description: string;
+  expected_annual_return: string;
+  explanation: {
+    why_this: string;
+    what_to_expect: string;
+  };
 }
 
 export interface UserProfile {
   name: string;
-  ageRange: string;
-  occupation: string;
   financialGoals: string[];
   investmentInterests: string[];
-  motivation: string;
-  riskAppetite: 'Low' | 'Medium' | 'High';
   riskProfile?: RiskProfileData;
+  ageRange?: string;
+  occupation?: string;
+  motivation?: string;
+  riskAppetite?: string;
+}
+
+export interface PlaylistItem {
+  name: string;
+  returns: string;
+  weight: string;
+  icon: string;
+}
+
+export interface PerformancePoint {
+  date: string;
+  value: number;
+}
+
+export interface Playlist {
+  id: string;
+  title: string;
+  emoji: string;
+  returns: string;
+  numericReturn: number;
+  description: string;
+  items: PlaylistItem[];
+  color: string;
+  historicalData?: PerformancePoint[];
 }
 
 export interface InvestmentAllocation {
@@ -42,29 +70,39 @@ export interface InvestmentPlan {
   riskLevel?: string;
 }
 
+export interface NewsItem {
+  id: string;
+  title: string;
+  subtitle: string;
+  imageUrl: string;
+  sourceUrl: string;
+  date: string;
+  brands: { logo: string; name: string }[];
+  insight: string;
+}
+
 export enum AppState {
   LANDING = 1,
-  PROJECTION = 2,
-  AUTOMATED_UPDATE = 3,
-  DO_NOT_INVEST = 4,
-  BUDDY_INTRO = 5,
-  ASK_NAME = 6,
-  AGE_CONFIRM = 7,
-  UNDERAGE = 8,
-  INVESTED_BEFORE = 9,
-  FUTURE_GOALS = 10,
-  SELECTED_GOALS = 11,
-  HELP_OPTIONS = 12,
-  SELECTED_HELP_OPTIONS = 13,
-  INVESTING_STATUS = 14,
-  INVESTING_BENEFIT = 15,
-  INVESTMENT_DURATION = 16,
-  RISK_TOLERANCE = 17,
-  FINALIZE_PLAN = 18,
-  BUDDY_CELEBRATE = 19,
-  SIGNUP = 20,
-  VERIFY_EMAIL_OTP = 21,
-  LOGIN_EMAIL = 22,
-  ANALYZING = 23,
-  DASHBOARD = 24,
+  BUDDY_INTRO = 2,
+  ASK_NAME = 3,
+  AGE_CONFIRM = 4,
+  UNDERAGE = 5,
+  FUTURE_GOALS = 6,
+  HELP_OPTIONS = 7,
+  INVESTING_STATUS = 8,
+  INVESTMENT_DURATION = 9,
+  RISK_TOLERANCE = 10,
+  FINALIZE_PLAN = 11,
+  SIGNUP = 12,
+  VERIFY_EMAIL_OTP = 13,
+  ANALYZING = 14,
+  PLAYLIST_RESULT = 15,
+  HOME = 16,
+  PLAYLIST_DETAIL = 17,
+  CREATE_VIBE = 18,
+  CREATE_COMPANIES = 19,
+  CREATE_GOAL = 20,
+  SELECTED_GOALS = 21,
+  SELECTED_HELP = 22,
+  SELECTED_STATUS = 23,
 }

@@ -70,9 +70,9 @@ export const InvestmentProjectionScreen: React.FC<InvestmentProjectionScreenProp
         </button>
       </header>
 
-      {/* Segmented Progress Bar (Step 2 of 3) */}
+      {/* Segmented Progress Bar (Step 2 of 2) */}
       <div className="px-6 w-full z-20 mb-8 flex gap-2">
-         {[1, 2, 3].map((step) => (
+         {[1, 2].map((step) => (
            <button 
              key={step} 
              onClick={() => onJumpToStep(step)}

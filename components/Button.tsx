@@ -12,13 +12,15 @@ export const Button: React.FC<ButtonProps> = ({
   className = '',
   ...props 
 }) => {
-  const baseStyles = "py-3 px-6 rounded-full font-semibold transition-all duration-200 transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed";
+  const baseStyles = "py-3 px-8 rounded-full font-bold transition-all duration-300 transform active:scale-95 focus:outline-none focus:ring-2 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed text-center";
   
   const variants = {
-    // Standardized Orange -> Yellow gradient with Black text for high visibility/optimism
-    primary: "bg-gradient-to-r from-orange-400 to-yellow-400 hover:from-orange-500 hover:to-yellow-500 text-gray-900 shadow-xl shadow-orange-500/20 focus:ring-orange-500 border-none",
-    secondary: "bg-white hover:bg-orange-50 text-orange-600 shadow-md focus:ring-orange-200",
-    outline: "border-2 border-orange-500 text-orange-600 hover:bg-orange-50 focus:ring-orange-500"
+    // Primary: Lime/Neon Yellow-Green background with Dark text
+    primary: "bg-[#DFFF4F] text-[#1F1F1F] hover:shadow-lg hover:shadow-[#DFFF4F]/40 focus:ring-[#DFFF4F] border-none",
+    // Secondary: Soft Purple border and text
+    secondary: "bg-transparent border-2 border-[#9B7EEC] text-[#9B7EEC] hover:bg-[#9B7EEC]/10 focus:ring-[#9B7EEC]",
+    // Outline: Neutral muted
+    outline: "border-2 border-[#D8C8EE] text-[#5F5F73] hover:bg-white focus:ring-[#D8C8EE]"
   };
 
   return (

@@ -1,9 +1,10 @@
+
 import { GoogleGenAI, Type } from "@google/genai";
 import { UserProfile, InvestmentPlan } from "../types";
 
-const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
-
 export const generateInvestmentPlan = async (profile: UserProfile): Promise<InvestmentPlan> => {
+  // Always initialize GoogleGenAI inside the function to ensure the correct apiKey from process.env is used.
+  const ai = new GoogleGenAI({ apiKey: process.env.API_KEY });
   const model = "gemini-3-flash-preview";
   const rp = profile.riskProfile;
 
@@ -14,9 +15,11 @@ export const generateInvestmentPlan = async (profile: UserProfile): Promise<Inve
     - Name: ${profile.name}
     - Ambitions: ${profile.financialGoals.join(", ")}
     - Risk Profile: ${rp?.type} (Score: ${rp?.score}/25)
-    - Targeted Growth: ${rp?.returns} per year (${rp?.risk_level} risk)
+    // Fixed returns -> expected_annual_return
+    - Targeted Growth: ${rp?.expected_annual_return} per year (${rp?.risk_level} risk)
 
     **Investment Strategy (MANDATORY ALLOCATIONS):**
+    // Fixed missing equity/debt range properties
     - Equity: ${rp?.equity_display}% (Allowed range: ${rp?.equity_min}% to ${rp?.equity_max}%)
     - Debt: ${rp?.debt_display}% (Allowed range: ${rp?.debt_min}% to ${rp?.debt_max}%)
     - Gold: ${rp?.gold}%
@@ -30,7 +33,8 @@ export const generateInvestmentPlan = async (profile: UserProfile): Promise<Inve
     2. summary: A catchy 3-word title.
     3. rationale: Explain the logic for a ${rp?.type} profile in a warm tone.
     4. firstSteps: 3 concrete steps for an Indian investor.
-    5. expectedReturn: "${rp?.returns}".
+    // Fixed returns -> expected_annual_return
+    5. expectedReturn: "${rp?.expected_annual_return}".
     6. riskLevel: "${rp?.risk_level}".
   `;
 
@@ -67,8 +71,9 @@ export const generateInvestmentPlan = async (profile: UserProfile): Promise<Inve
       },
     });
 
+    // Use response.text as a property, not a method.
     if (response.text) {
-      return JSON.parse(response.text) as InvestmentPlan;
+      return JSON.parse(response.text.trim()) as InvestmentPlan;
     }
     throw new Error("No response text from Gemini");
   } catch (error) {
@@ -82,7 +87,8 @@ export const generateInvestmentPlan = async (profile: UserProfile): Promise<Inve
       summary: `${rp?.type || 'Balanced'} Growth Plan`,
       rationale: `Hey ${profile.name}, based on your score of ${rp?.score}, this mix balances stability with growth potential.`,
       firstSteps: ["Complete your KYC", "Start a SIP of ₹1,000", "Link your Bank Account"],
-      expectedReturn: rp?.returns || "8-10%",
+      // Fixed returns -> expected_annual_return
+      expectedReturn: rp?.expected_annual_return || "8-10%",
       riskLevel: rp?.risk_level || "Moderate-High"
     };
   }
