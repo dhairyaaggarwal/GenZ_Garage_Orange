@@ -40,6 +40,7 @@ export const AnalyzingScreen: React.FC<AnalyzingScreenProps> = ({ onComplete }) 
             const plan = await generateInvestmentPlan(profile);
             onComplete(plan);
         } catch (error) {
+            console.error("Analysis Failed:", error);
             onComplete({
                 allocations: [{ assetClass: 'Equity', percentage: 70, color: '#9B7EEC' }],
                 summary: 'Growth Plan',
@@ -53,10 +54,10 @@ export const AnalyzingScreen: React.FC<AnalyzingScreenProps> = ({ onComplete }) 
 
     startAnalysis();
     return () => clearInterval(interval);
-  }, []);
+  }, [onComplete]);
 
   return (
-    <div className="h-full flex flex-col items-center justify-center bg-brand-bg px-6 text-center">
+    <div className="h-full flex flex-col items-center justify-center bg-brand-bg px-6 text-center" role="status" aria-live="polite">
       <div className="relative mb-16 scale-110">
         <div className="w-40 h-40 rounded-full bg-brand-secondary/10 animate-pulse absolute top-0 left-0"></div>
         <div className="w-40 h-40 rounded-full bg-white border-4 border-brand-card flex items-center justify-center relative z-10 shadow-2xl">
@@ -82,10 +83,9 @@ export const AnalyzingScreen: React.FC<AnalyzingScreenProps> = ({ onComplete }) 
         <div className="h-full bg-brand-secondary animate-[loading_8s_linear_infinite]"></div>
       </div>
 
-      {/* Increased contrast for readability */}
       <div className="mt-12 flex items-center gap-2 text-[14px] font-black uppercase tracking-widest text-[#1F1F1F]">
         <Heart size={18} className="text-[#9B7EEC] fill-[#9B7EEC]" />
-        <span>Made by GenZ for the GenZ xoxo</span>
+        <span>MADE BY GENZ FOR THE GENZ XoXo</span>
       </div>
 
       <style>{`

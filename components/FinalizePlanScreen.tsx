@@ -1,9 +1,10 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Button } from './Button';
 import { CircularHeader } from './CircularHeader';
 import { getOnboardingState } from '../utils/onboardingState';
 import { Check, Info, ShieldCheck } from 'lucide-react';
+import { speakBuddy } from '../utils/voice';
 
 interface FinalizePlanScreenProps {
   onContinue: () => void;
@@ -27,13 +28,21 @@ const SummaryRow = ({ label, value, progress, isCompleted }: { label: string, va
 
 export const FinalizePlanScreen: React.FC<FinalizePlanScreenProps> = ({ onContinue, onJumpToStep }) => {
   const [showContent, setShowContent] = useState(false);
+  const hasPlayedRef = useRef(false);
   const state = getOnboardingState();
 
   useEffect(() => {
-    const t = setTimeout(() => setShowContent(true), 400);
-    const utterance = new SpeechSynthesisUtterance("I've put together a plan that grows with you. Ready to see it?");
-    window.speechSynthesis.speak(utterance);
-    return () => { clearTimeout(t); window.speechSynthesis.cancel(); };
+    const t = setTimeout(() => {
+      setShowContent(true);
+      if (!hasPlayedRef.current) {
+        hasPlayedRef.current = true;
+        speakBuddy("I've put together a plan that grows with you. Ready to see it?");
+      }
+    }, 400);
+    return () => {
+      clearTimeout(t);
+      window.speechSynthesis.cancel();
+    };
   }, []);
 
   return (

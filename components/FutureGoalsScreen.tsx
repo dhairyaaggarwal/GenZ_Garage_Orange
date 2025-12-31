@@ -2,7 +2,7 @@
 import React, { useEffect, useState, useRef } from 'react';
 import { Button } from './Button';
 import { CircularHeader } from './CircularHeader';
-import { getOnboardingState } from '../utils/onboardingState';
+import { speakBuddy } from '../utils/voice';
 
 interface FutureGoalsScreenProps {
   onContinue: (selectedGoals: string[]) => void;
@@ -20,16 +20,19 @@ const goals = [
 
 export const FutureGoalsScreen: React.FC<FutureGoalsScreenProps> = ({ onContinue, onJumpToStep }) => {
   const [selectedGoals, setSelectedGoals] = useState<string[]>([]);
-  const hasPlayedIntroRef = useRef(false);
+  const hasPlayedRef = useRef(false);
 
   useEffect(() => {
-    if (!hasPlayedIntroRef.current) {
-        const text = `What are your future goals?`;
-        const utterance = new SpeechSynthesisUtterance(text);
-        window.speechSynthesis.speak(utterance);
-        hasPlayedIntroRef.current = true;
-    }
-    return () => window.speechSynthesis.cancel();
+    const timer = setTimeout(() => {
+      if (hasPlayedRef.current) return;
+      hasPlayedRef.current = true;
+      speakBuddy("What are your future goals?");
+    }, 600);
+    
+    return () => {
+      clearTimeout(timer);
+      window.speechSynthesis.cancel();
+    };
   }, []);
 
   const toggleGoal = (id: string) => {

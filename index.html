@@ -3,13 +3,26 @@
 <html lang="en">
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
     <title>Orange - Your Financial Buddy</title>
+    
+    <!-- PWA / Native App Meta Tags -->
+    <link rel="manifest" href="manifest.json" />
+    <meta name="mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+    <meta name="apple-mobile-web-app-title" content="Orange" />
+    <link rel="apple-touch-icon" href="https://cdn-icons-png.flaticon.com/512/6001/6001509.png" />
+    <meta name="theme-color" content="#E9DDF3" />
+
     <script src="https://cdn.tailwindcss.com"></script>
     <script>
       tailwind.config = {
         theme: {
           extend: {
+            screens: {
+              'xs': '375px',
+            },
             colors: {
               brand: {
                 bg: '#E9DDF3',
@@ -30,6 +43,7 @@
               blob: "blob 7s infinite",
               'gradient-xy': 'gradient-xy 6s ease infinite',
               'pulse-slow': 'pulse 3s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+              'fade-in-up': 'fadeInUp 0.5s ease-out forwards',
             },
             keyframes: {
               blob: {
@@ -41,6 +55,10 @@
               'gradient-xy': {
                 '0%, 100%': { 'background-size': '200% 200%', 'background-position': 'left top' },
                 '50%': { 'background-size': '200% 200%', 'background-position': 'right bottom' }
+              },
+              fadeInUp: {
+                '0%': { opacity: '0', transform: 'translateY(10px)' },
+                '100%': { opacity: '1', transform: 'translateY(0)' }
               }
             },
           },
@@ -49,37 +67,82 @@
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&display=swap" rel="stylesheet">
     <style>
+      :root {
+        --sat: env(safe-area-inset-top);
+        --sar: env(safe-area-inset-right);
+        --sab: env(safe-area-inset-bottom);
+        --sal: env(safe-area-inset-left);
+      }
+
+      * {
+        box-sizing: border-box;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
+      }
+
       body {
         font-family: 'Inter', sans-serif;
         background-color: #E9DDF3;
         color: #1F1F1F;
+        margin: 0;
+        padding: 0;
+        overflow: hidden; 
+        overscroll-behavior: none;
+        -webkit-tap-highlight-color: transparent;
+        touch-action: manipulation;
+        height: 100dvh;
       }
-      ::-webkit-scrollbar { width: 6px; }
-      ::-webkit-scrollbar-track { background: #E9DDF3; }
-      ::-webkit-scrollbar-thumb { background: #9B7EEC; border-radius: 10px; }
+      
+      #root {
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        position: relative;
+        overflow: hidden;
+      }
+
+      /* Transitions */
+      .screen-container {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        width: 100%;
+        height: 100%;
+        position: relative;
+        overflow: hidden;
+        animation: fadeInUp 0.4s ease-out forwards;
+      }
+
+      /* Custom UI Classes */
+      .no-scrollbar::-webkit-scrollbar { display: none; }
+      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       
       .option-card-default {
         background: #FFFFFF;
         border: 2px solid #D8C8EE;
-        transition: all 0.2s ease-in-out;
+        transition: all 0.2s cubic-bezier(0.4, 0, 0.2, 1);
       }
       .option-card-selected {
         background: #F5F2FF;
         border: 2px solid #9B7EEC;
-        transform: scale(1.02);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(155, 126, 236, 0.15);
       }
+      
       .glass-card {
         background: rgba(255, 255, 255, 0.6);
         backdrop-filter: blur(12px);
+        -webkit-backdrop-filter: blur(12px);
         border: 1px solid rgba(155, 126, 236, 0.2);
       }
-      .no-scrollbar::-webkit-scrollbar { display: none; }
-      .no-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
       
-      input[type=range].accent-brand-secondary::-webkit-slider-thumb {
-        background: #9B7EEC;
-        border: 4px solid #FFFFFF;
-        box-shadow: 0 4px 10px rgba(155, 126, 236, 0.3);
+      input[type=range].accent-brand-secondary {
+        accent-color: #9B7EEC;
+      }
+      
+      /* Fix for mobile keyboard pushing UI */
+      @media (max-height: 500px) {
+        .hide-on-keyboard { display: none; }
       }
     </style>
   <script type="importmap">

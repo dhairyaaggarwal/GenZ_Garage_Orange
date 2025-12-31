@@ -1,6 +1,8 @@
+
 import React, { useEffect, useState, useRef } from 'react';
 import { Button } from './Button';
 import { CircularHeader } from './CircularHeader';
+import { speakBuddy } from '../utils/voice';
 
 interface IncomeScreenProps {
   onContinue: (incomeBracket: string) => void;
@@ -25,8 +27,6 @@ const INCOME_BRACKETS = [
   "Rs 45L+"
 ];
 
-// Using "Rachel" - High energy, clear
-const ELEVEN_LABS_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"; 
 const VOICE_TEXT = "Next — a few quick questions about your financial situation. How much do you make every year?";
 
 export const IncomeScreen: React.FC<IncomeScreenProps> = ({ onContinue }) => {
@@ -34,60 +34,19 @@ export const IncomeScreen: React.FC<IncomeScreenProps> = ({ onContinue }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const hasPlayedRef = useRef(false);
 
-  // --- Voice Logic (Audio Only) ---
-  const playVoice = async () => {
-    if (hasPlayedRef.current) return;
-    hasPlayedRef.current = true;
-    setIsPlaying(true);
-
-    const apiKey = process.env.ELEVEN_LABS_API_KEY;
-    let audio: HTMLAudioElement | null = null;
-
-    if (apiKey) {
-      try {
-        const response = await fetch(
-          `https://api.elevenlabs.io/v1/text-to-speech/${ELEVEN_LABS_VOICE_ID}`, 
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'xi-api-key': apiKey },
-            body: JSON.stringify({
-              text: VOICE_TEXT,
-              model_id: "eleven_monolingual_v1",
-              voice_settings: { stability: 0.5, similarity_boost: 0.75 }
-            })
-          }
-        );
-        if (response.ok) {
-          const blob = await response.blob();
-          const url = URL.createObjectURL(blob);
-          audio = new Audio(url);
-        }
-      } catch (e) {
-        console.warn("ElevenLabs failed");
-      }
-    }
-
-    if (!audio) {
-      // Fallback
-      const utterance = new SpeechSynthesisUtterance(VOICE_TEXT);
-      const voices = window.speechSynthesis.getVoices();
-      const naturalVoice = voices.find(v => v.name.includes("Natural") || v.name.includes("Google US English"));
-      if (naturalVoice) utterance.voice = naturalVoice;
-      utterance.rate = 1.15; 
-      utterance.pitch = 1.1;
-      utterance.onend = () => setIsPlaying(false);
-      window.speechSynthesis.speak(utterance);
-    } else {
-      audio.onended = () => setIsPlaying(false);
-      audio.play().catch(() => setIsPlaying(false));
-    }
-  };
-
   useEffect(() => {
-    setTimeout(playVoice, 500);
+    const playVoice = () => {
+      if (hasPlayedRef.current) return;
+      hasPlayedRef.current = true;
+      setIsPlaying(true);
+      speakBuddy(VOICE_TEXT, () => setIsPlaying(false));
+    };
+
+    const timer = setTimeout(playVoice, 800);
     return () => { 
         window.speechSynthesis.cancel();
         setIsPlaying(false);
+        clearTimeout(timer);
     };
   }, []);
 
@@ -99,20 +58,11 @@ export const IncomeScreen: React.FC<IncomeScreenProps> = ({ onContinue }) => {
     }
   };
 
-  const handleSelection = (bracket: string) => {
-    setSelectedIncome(bracket);
-  };
-
   return (
     <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-gradient-to-br from-orange-400 via-rose-300 to-orange-200 font-sans">
-      
-      {/* Background - Clean gradient, no particles */}
       <div className="absolute inset-0 bg-gradient-to-b from-white/10 to-transparent pointer-events-none"></div>
-
-      {/* Header with Circular Progress (Step 4 of 4) */}
       <CircularHeader currentStep={4} totalSteps={4} />
 
-      {/* Voice Activity Indicator */}
       <div className="absolute top-[5.5rem] left-0 w-full flex justify-center pointer-events-none z-20">
         <div className={`transition-opacity duration-500 ${isPlaying ? 'opacity-100' : 'opacity-0'}`}>
             <div className="flex items-center gap-1 h-4">
@@ -123,22 +73,18 @@ export const IncomeScreen: React.FC<IncomeScreenProps> = ({ onContinue }) => {
         </div>
       </div>
 
-      {/* Main Content */}
       <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-6 overflow-hidden">
-         
-         {/* Title */}
          <h1 className="text-3xl font-gray-900 text-center mb-6 leading-tight drop-shadow-sm shrink-0">
            <span className="font-bold">How much do you make</span> <br/> <span className="italic font-serif">annually?</span>
          </h1>
 
-         {/* Scrollable Options List */}
          <div className="w-full flex-1 overflow-y-auto no-scrollbar pb-32 space-y-3">
            {INCOME_BRACKETS.map((bracket) => {
              const isSelected = selectedIncome === bracket;
              return (
                <button 
                  key={bracket}
-                 onClick={() => handleSelection(bracket)}
+                 onClick={() => setSelectedIncome(bracket)}
                  className={`w-full p-4 rounded-2xl flex items-center justify-center transition-all duration-200 font-bold text-lg border-2 shadow-sm ${
                    isSelected 
                      ? 'bg-gradient-to-r from-orange-500 to-rose-500 text-white border-transparent scale-[1.02] shadow-orange-500/30' 
@@ -152,10 +98,8 @@ export const IncomeScreen: React.FC<IncomeScreenProps> = ({ onContinue }) => {
              );
            })}
          </div>
-
       </div>
 
-      {/* Bottom CTA */}
       <div className="absolute bottom-0 left-0 w-full p-6 pb-10 bg-gradient-to-t from-rose-300 via-rose-300/90 to-transparent z-20">
          <div className="max-w-md mx-auto">
             <Button 
@@ -166,11 +110,6 @@ export const IncomeScreen: React.FC<IncomeScreenProps> = ({ onContinue }) => {
                Continue
             </Button>
          </div>
-      </div>
-      
-      {/* Screen Reader Announcements */}
-      <div aria-live="polite" className="sr-only">
-        {isPlaying ? "Buddy is speaking: Next, a few quick questions about your financial situation." : "Audio ended."}
       </div>
     </div>
   );

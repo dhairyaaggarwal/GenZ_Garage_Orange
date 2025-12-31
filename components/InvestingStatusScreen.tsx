@@ -1,8 +1,8 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Button } from './Button';
 import { CircularHeader } from './CircularHeader';
-import { getOnboardingState } from '../utils/onboardingState';
+import { speakBuddy } from '../utils/voice';
 
 interface InvestingStatusScreenProps {
   onContinue: (selectedStatus: string[]) => void;
@@ -18,13 +18,21 @@ const STATUS_OPTIONS = [
 
 export const InvestingStatusScreen: React.FC<InvestingStatusScreenProps> = ({ onContinue, onJumpToStep }) => {
   const [selectedStatus, setSelectedStatus] = useState<string[]>([]);
+  const hasPlayedRef = useRef(false);
 
   useEffect(() => {
-    const state = getOnboardingState();
-    const name = state.first_name || 'Friend';
-    const utterance = new SpeechSynthesisUtterance(`${name}, are you currently investing or saving?`);
-    window.speechSynthesis.speak(utterance);
-    return () => window.speechSynthesis.cancel();
+    const playVoice = () => {
+      if (hasPlayedRef.current) return;
+      hasPlayedRef.current = true;
+      // Removed name as per user request
+      speakBuddy(`Are you currently investing or saving?`);
+    };
+
+    const timer = setTimeout(playVoice, 800);
+    return () => {
+      window.speechSynthesis.cancel();
+      clearTimeout(timer);
+    };
   }, []);
 
   const toggleOption = (id: string) => {

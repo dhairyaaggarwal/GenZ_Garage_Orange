@@ -1,0 +1,25 @@
+
+{
+  "name": "Orange - Your Financial Buddy",
+  "short_name": "Orange",
+  "description": "Smart investing for the next generation of India.",
+  "start_url": "/",
+  "display": "standalone",
+  "background_color": "#E9DDF3",
+  "theme_color": "#9B7EEC",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/6001/6001509.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any maskable"
+    },
+    {
+      "src": "https://cdn-icons-png.flaticon.com/512/6001/6001509.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any maskable"
+    }
+  ]
+}

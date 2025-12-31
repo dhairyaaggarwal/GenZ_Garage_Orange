@@ -1,5 +1,7 @@
-import React, { useEffect, useState } from 'react';
+
+import React, { useEffect, useRef } from 'react';
 import { Button } from './Button';
+import { speakBuddy } from '../utils/voice';
 
 interface BuddyCelebrateScreenProps {
   onContinue: () => void;
@@ -8,10 +10,20 @@ interface BuddyCelebrateScreenProps {
 const CAPTION_FULL = "Way to go! We have all we need to put together your plan.";
 
 export const BuddyCelebrateScreen: React.FC<BuddyCelebrateScreenProps> = ({ onContinue }) => {
+  const hasPlayedRef = useRef(false);
+
   useEffect(() => {
-    const utterance = new SpeechSynthesisUtterance(CAPTION_FULL);
-    window.speechSynthesis.speak(utterance);
-    return () => window.speechSynthesis.cancel();
+    const playVoice = () => {
+      if (hasPlayedRef.current) return;
+      hasPlayedRef.current = true;
+      speakBuddy(CAPTION_FULL);
+    };
+
+    const timer = setTimeout(playVoice, 800);
+    return () => {
+      window.speechSynthesis.cancel();
+      clearTimeout(timer);
+    };
   }, []);
 
   return (

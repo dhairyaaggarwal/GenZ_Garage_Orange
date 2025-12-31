@@ -1,8 +1,8 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Button } from './Button';
 import { CircularHeader } from './CircularHeader';
-import { ShieldCheck } from 'lucide-react';
+import { speakBuddy, stopBuddy } from '../utils/voice';
 
 interface RiskToleranceScreenProps {
   onContinue: (riskTolerance: string) => void;
@@ -38,14 +38,23 @@ const RISK_OPTIONS = [
 
 export const RiskToleranceScreen: React.FC<RiskToleranceScreenProps> = ({ onContinue, onJumpToStep }) => {
   const [selectedRisk, setSelectedRisk] = useState<string | null>(null);
+  const hasPlayedRef = useRef(false);
 
   useEffect(() => {
-    const utterance = new SpeechSynthesisUtterance(
-      "How do you feel about your money growing over time? There are no wrong answers here, and you can change your mind anytime."
-    );
-    utterance.rate = 1.1;
-    window.speechSynthesis.speak(utterance);
-    return () => window.speechSynthesis.cancel();
+    const playVoice = () => {
+      if (hasPlayedRef.current) return;
+      hasPlayedRef.current = true;
+      
+      // Removed name injection as per user request
+      speakBuddy(`Last question on this part. How do you feel about your money growing over time? There are no wrong answers here, and you can change your mind anytime.`);
+    };
+
+    const timer = setTimeout(playVoice, 800);
+    
+    return () => {
+      clearTimeout(timer);
+      stopBuddy();
+    };
   }, []);
 
   return (

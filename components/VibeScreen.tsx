@@ -1,84 +1,114 @@
 
-import React, { useState } from 'react';
-import { ArrowLeft, HelpCircle, Sparkles } from 'lucide-react';
+import React, { useState, useEffect, useRef } from 'react';
+import { ArrowLeft } from 'lucide-react';
 import { Button } from './Button';
+import { CircularHeader } from './CircularHeader';
+import { speakBuddy } from '../utils/voice';
 
 interface VibeScreenProps {
   onContinue: (vibes: string[]) => void;
   onBack: () => void;
+  isOnboarding?: boolean;
 }
 
 const VIBES = [
-  { id: 'it', label: 'Tech Giants', sub: 'The Digital Backbone', emoji: '💻', color: 'bg-cyan-500' },
-  { id: 'fintech', label: 'Modern Finance', sub: 'Future of Money', emoji: '💳', color: 'bg-purple-500' },
-  { id: 'digital_payments', label: 'Digital India', sub: 'Smart Payments', emoji: '💸', color: 'bg-pink-500' },
-  { id: 'renewable', label: 'Green Energy', sub: 'Solar & Wind Future', emoji: '☀️', color: 'bg-orange-500' },
-  { id: 'ev', label: 'Future Mobility', sub: 'Electric Cars & Tech', emoji: '🔋', color: 'bg-emerald-500' },
-  { id: 'green_energy', label: 'Planet First', sub: 'Sustainable Growth', emoji: '🌱', color: 'bg-green-500' },
-  { id: 'pharma', label: 'Life Savers', sub: 'Medicine & Research', emoji: '💊', color: 'bg-blue-500' },
-  { id: 'hospitals', label: 'Safe Infrastructure', sub: 'Medical Care Leaders', emoji: '🏥', color: 'bg-indigo-500' },
-  { id: 'biotech', label: 'Health Innovation', sub: 'Cutting Edge Research', emoji: '🧬', color: 'bg-teal-500' },
+  { id: 'it', label: 'TECH GIANTS', sub: 'DIGITAL BACKBONE', emoji: '💻', color: 'bg-[#1D8FA5]' },
+  { id: 'fintech', label: 'FINANCE', sub: 'FUTURE OF MONEY', emoji: '💳', color: 'bg-[#7E57C2]' },
+  { id: 'digital_payments', label: 'DIGITAL INDIA', sub: 'PAYMENTS', emoji: '💸', color: 'bg-[#AD3F70]' },
+  { id: 'renewable', label: 'RENEWABLE', sub: 'SOLAR & WIND', emoji: '☀️', color: 'bg-[#FF6D00]' },
+  { id: 'ev', label: 'EV TECH', sub: 'MOBILITY', emoji: '🔋', color: 'bg-[#2E7D32]' },
+  { id: 'green_energy', label: 'PLANET', sub: 'SUSTAINABLE', emoji: '🌱', color: 'bg-[#388E3C]' },
+  { id: 'pharma', label: 'PHARMA', sub: 'HEALTHCARE', emoji: '💊', color: 'bg-[#2C5282]' },
+  { id: 'hospitals', label: 'MEDICAL', sub: 'INFRASTRUCTURE', emoji: '🏥', color: 'bg-[#434190]' },
+  { id: 'biotech', label: 'BIOTECH', sub: 'INNOVATION', emoji: '🧬', color: 'bg-[#319795]' },
 ];
 
-export const VibeScreen: React.FC<VibeScreenProps> = ({ onContinue, onBack }) => {
+const VOICE_PROMPT = "Select the sectors you relate to and we will align your strategy accordingly";
+
+export const VibeScreen: React.FC<VibeScreenProps> = ({ onContinue, onBack, isOnboarding = false }) => {
   const [selected, setSelected] = useState<string[]>([]);
+  const hasPlayedRef = useRef(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      if (hasPlayedRef.current) return;
+      hasPlayedRef.current = true;
+      speakBuddy(VOICE_PROMPT);
+    }, 800);
+    
+    return () => {
+      clearTimeout(timer);
+      window.speechSynthesis.cancel();
+    };
+  }, []);
 
   const toggle = (id: string) => {
     setSelected(prev => prev.includes(id) ? prev.filter(x => x !== id) : [...prev, id]);
   };
 
   return (
-    <div className="flex flex-col h-full bg-[#121826] text-white font-sans overflow-y-auto no-scrollbar">
-      <header className="px-6 pt-12 flex justify-between items-center">
-        <button onClick={onBack} className="p-2 -ml-2 text-white/60 hover:text-white transition-colors">
-          <ArrowLeft size={24} />
-        </button>
-        <button onClick={() => onContinue([])} className="text-white/40 font-bold uppercase tracking-widest text-xs hover:text-white transition-colors border border-white/10 px-4 py-1.5 rounded-full">Skip Vibe</button>
-      </header>
+    <div className="screen-container bg-brand-bg text-brand-text">
+      <CircularHeader currentStep={3} totalSteps={5} />
 
-      <div className="px-6 py-8">
-        <div className="flex items-center gap-2 mb-2">
-            <Sparkles className="text-brand-primary" size={20} />
-            <h1 className="text-xl font-black uppercase tracking-widest">Step 1: Your Vibe</h1>
+      <div className="flex-1 flex flex-col overflow-hidden">
+        <div className="px-6 pt-4 pb-6 shrink-0 text-center">
+          <h1 className="text-3xl xs:text-4xl font-black uppercase tracking-tighter leading-none mb-2 text-brand-text">
+            PICK WHAT<br/>
+            <span className="text-brand-secondary italic font-serif">YOU TRUST</span>
+          </h1>
         </div>
-        <h1 className="text-5xl font-black text-[#FFB7A5] uppercase mb-4 tracking-tighter leading-none">Pick what<br/>you trust</h1>
-        <p className="text-white/50 text-sm font-medium leading-relaxed max-w-[280px]">Select sectors you relate to. Buddy will find the best regulated stocks in these areas.</p>
+
+        <div className="flex-1 px-4 overflow-y-auto no-scrollbar pb-40">
+          <div className="grid grid-cols-3 gap-2 sm:gap-4 max-w-lg mx-auto">
+            {VIBES.map((vibe) => {
+              const isSelected = selected.includes(vibe.id);
+              return (
+                <button
+                  key={vibe.id}
+                  onClick={() => toggle(vibe.id)}
+                  className={`aspect-square rounded-[1.5rem] xs:rounded-[2.5rem] p-3 flex flex-col justify-between transition-all relative overflow-hidden group shadow-sm ${vibe.color} ${isSelected ? 'ring-4 ring-brand-secondary scale-[1.05] z-10' : 'opacity-90'}`}
+                >
+                  <div className="w-8 h-8 xs:w-10 xs:h-10 rounded-xl bg-white/30 backdrop-blur-md flex items-center justify-center text-lg xs:text-xl shadow-inner shrink-0 text-white">
+                    {vibe.emoji}
+                  </div>
+                  
+                  <div className="text-left mt-1">
+                    <div className="bg-black/10 p-1.5 rounded-xl mb-1 min-h-[32px] flex items-center">
+                      <p className="text-[8px] xs:text-[10px] font-black uppercase leading-tight text-white">{vibe.label}</p>
+                    </div>
+                    <p className="text-[6px] xs:text-[8px] font-black text-white/70 uppercase tracking-tighter leading-none pl-0.5">
+                      {vibe.sub}
+                    </p>
+                  </div>
+
+                  {isSelected && (
+                    <div className="absolute top-2 right-2 xs:top-3 xs:right-3 w-4 h-4 xs:w-5 xs:h-5 bg-white rounded-full flex items-center justify-center text-brand-secondary text-[8px] xs:text-[10px] font-black animate-in zoom-in shadow-md">
+                      ✓
+                    </div>
+                  )}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
-      <div className="flex-1 px-6 grid grid-cols-3 gap-4 pb-56">
-        {VIBES.map((vibe) => {
-          const isSelected = selected.includes(vibe.id);
-          return (
-            <button
-              key={vibe.id}
-              onClick={() => toggle(vibe.id)}
-              className={`aspect-square rounded-[2.5rem] p-4 flex flex-col justify-between transition-all relative overflow-hidden group ${vibe.color} ${isSelected ? 'ring-4 ring-[#DFFF4F] scale-105 z-10 shadow-xl shadow-black/40' : 'opacity-70 grayscale-[20%] hover:grayscale-0 hover:opacity-100 hover:scale-[1.02]'}`}
+      <div className="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-brand-bg via-brand-bg/95 to-transparent z-30">
+        <div className="max-w-md mx-auto flex flex-col items-center">
+            <Button 
+                onClick={() => onContinue(selected)} 
+                disabled={selected.length === 0}
+                className="w-full py-5 text-xl font-black bg-brand-primary text-brand-text border-none shadow-xl shadow-brand-primary/30"
             >
-              <div className="text-2xl bg-white/20 w-11 h-11 rounded-2xl flex items-center justify-center backdrop-blur-md shadow-inner">{vibe.emoji}</div>
-              <div className="text-left space-y-1">
-                  <p className="text-[10px] font-black uppercase leading-tight bg-black/20 p-1.5 rounded-lg inline-block">{vibe.label}</p>
-                  <p className="text-[7px] font-bold text-white/70 uppercase tracking-tighter leading-none block">{vibe.sub}</p>
-              </div>
-              {isSelected && <div className="absolute top-4 right-4 w-6 h-6 bg-[#DFFF4F] rounded-full flex items-center justify-center text-black text-[12px] font-black shadow-lg animate-in zoom-in">✓</div>}
+                Continue
+            </Button>
+            <button 
+                onClick={onBack} 
+                className="mt-5 text-xs font-black uppercase tracking-[0.2em] text-brand-muted hover:text-brand-text transition-colors flex items-center gap-1"
+            >
+                ← BACK
             </button>
-          );
-        })}
-      </div>
-
-      {/* Experience Test Fix: Reassurance microcopy */}
-      <div className="fixed bottom-0 left-0 w-full p-6 bg-gradient-to-t from-[#121826] via-[#121826] to-transparent z-50">
-        <div className="flex items-center gap-2 mb-5 justify-center bg-white/5 py-3 rounded-2xl border border-white/5">
-            <HelpCircle size={14} className="text-brand-tertiary" />
-            <p className="text-[9px] font-bold text-white/50 uppercase tracking-widest">
-              Choosing "Safe Infrastructure" adds steady growth.
-            </p>
         </div>
-        <Button 
-          onClick={() => onContinue(selected)} 
-          className={`w-full py-5 text-xl font-black transition-all active:scale-95 ${selected.length > 0 ? 'bg-[#9B7EEC] text-white shadow-2xl shadow-purple-500/40' : 'bg-white/10 text-white/30'}`}
-        >
-          {selected.length > 0 ? `Create Mix (${selected.length})` : 'Continue'}
-        </Button>
       </div>
     </div>
   );

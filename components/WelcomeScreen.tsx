@@ -1,5 +1,7 @@
+
 import React, { useState, useEffect } from 'react';
 import { Button } from './Button';
+import { primeBuddy } from '../utils/voice';
 
 interface WelcomeScreenProps {
   onGetStarted: () => void;
@@ -19,6 +21,16 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted, onJu
   const [fade, setFade] = useState(true);
 
   useEffect(() => {
+    // Pre-load voices for Buddy
+    if (typeof window !== 'undefined' && window.speechSynthesis) {
+      window.speechSynthesis.getVoices();
+      if (window.speechSynthesis.onvoiceschanged !== undefined) {
+        window.speechSynthesis.onvoiceschanged = () => {
+          console.log("Buddy's voices loaded!");
+        };
+      }
+    }
+
     const interval = setInterval(() => {
       setFade(false);
       setTimeout(() => {
@@ -29,6 +41,12 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted, onJu
 
     return () => clearInterval(interval);
   }, []);
+
+  const handleStart = () => {
+    // CRITICAL: prime the engine on a direct user click
+    primeBuddy();
+    onGetStarted();
+  };
 
   return (
     <div className="flex-1 flex flex-col h-full relative overflow-hidden bg-brand-bg font-sans">
@@ -67,7 +85,6 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted, onJu
             fade ? 'opacity-100 translate-y-0' : 'opacity-0 translate-y-4'
           }`}
         >
-          {/* Using a deeper, more vibrant gradient for better visibility */}
           <span className="bg-clip-text text-transparent bg-gradient-to-r from-[#6D28D9] via-[#9B7EEC] to-[#F97316] leading-tight py-4 inline-block drop-shadow-sm">
             {phrases[currentPhraseIndex]}
           </span>
@@ -77,7 +94,7 @@ export const WelcomeScreen: React.FC<WelcomeScreenProps> = ({ onGetStarted, onJu
       {/* Bottom Action Area */}
       <div className="pb-16 px-6 w-full flex justify-center z-10">
         <Button 
-          onClick={onGetStarted} 
+          onClick={handleStart} 
           className="w-[85%] py-4 text-xl group hover:scale-[1.05] transition-all shadow-xl shadow-brand-primary/20"
         >
           Get Started

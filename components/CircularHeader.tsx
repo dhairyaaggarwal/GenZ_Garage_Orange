@@ -8,12 +8,12 @@ interface CircularHeaderProps {
 }
 
 export const CircularHeader: React.FC<CircularHeaderProps> = ({ currentStep, totalSteps = 5, onJumpToStep }) => {
-  const size = 64; // Reduced size
-  const strokeWidth = 6; // Thicker stroke for better visibility
+  const size = 56; 
+  const strokeWidth = 5; 
   const radius = (size - strokeWidth) / 2;
   const center = size / 2;
   
-  const gapAngle = 12;
+  const gapAngle = 14; 
   const availableAngle = 360 - (totalSteps * gapAngle);
   const segmentAngle = availableAngle / totalSteps;
   
@@ -33,8 +33,25 @@ export const CircularHeader: React.FC<CircularHeaderProps> = ({ currentStep, tot
   };
 
   return (
-    <header className="pt-10 pb-4 flex justify-center w-full z-20 relative">
-      <div className="relative flex items-center justify-center" style={{ width: size, height: size }}>
+    <header className="pt-8 pb-4 flex justify-center w-full z-20 shrink-0">
+      <div className="relative" style={{ width: size, height: size }}>
+        
+        {/* BRAND LOGO - Centered Container */}
+        <div className="absolute inset-0 flex items-center justify-center p-3 pointer-events-none">
+           <svg viewBox="0 0 100 100" className="w-full h-full drop-shadow-sm">
+             <path d="M50 25 C 50 25 65 5 85 15 C 85 15 75 35 50 35" fill="#DFFF4F" />
+             <path d="M50 25 C 50 25 35 5 15 15 C 15 15 25 35 50 35" fill="#9B7EEC" />
+             <circle cx="50" cy="60" r="30" fill="url(#brandGradHeader)" />
+             <defs>
+               <linearGradient id="brandGradHeader" x1="20" y1="20" x2="80" y2="90" gradientUnits="userSpaceOnUse">
+                 <stop offset="0%" stopColor="#9B7EEC" />
+                 <stop offset="100%" stopColor="#FFB7A5" />
+               </linearGradient>
+             </defs>
+           </svg>
+        </div>
+        
+        {/* PROGRESS RING */}
         <svg className="absolute inset-0 w-full h-full transform" viewBox={`0 0 ${size} ${size}`}>
           {Array.from({ length: totalSteps }).map((_, index) => {
             const stepNumber = index + 1;
@@ -44,24 +61,33 @@ export const CircularHeader: React.FC<CircularHeaderProps> = ({ currentStep, tot
             const isActive = stepNumber === currentStep;
             const isPast = stepNumber < currentStep;
             
-            let strokeColor = '#D8C8EE'; // Inactive - softer purple
-            if (isActive) strokeColor = '#9B7EEC'; // Active - Brand Purple
-            if (isPast) strokeColor = '#9B7EEC99'; // Past - Semi-transparent Purple
+            const trackColor = '#D8C8EE'; 
+            let strokeColor = 'transparent';
+            if (isActive || isPast) strokeColor = '#9B7EEC'; 
 
             return (
-              <path
-                key={index}
-                d={describeArc(center, center, radius, startAngle, endAngle)}
-                fill="none"
-                stroke={strokeColor}
-                strokeWidth={isActive ? strokeWidth + 1 : strokeWidth}
-                strokeLinecap="round"
-                onClick={() => onJumpToStep?.(stepNumber)}
-                className="transition-all duration-500 ease-out cursor-pointer hover:stroke-brand-secondary/70"
-                style={{ 
-                  filter: isActive ? 'drop-shadow(0 0 2px rgba(155, 126, 236, 0.5))' : 'none'
-                }}
-              />
+              <React.Fragment key={index}>
+                <path
+                  d={describeArc(center, center, radius, startAngle, endAngle)}
+                  fill="none"
+                  stroke={trackColor}
+                  strokeWidth={strokeWidth}
+                  strokeLinecap="round"
+                  className="opacity-30"
+                />
+                <path
+                  d={describeArc(center, center, radius, startAngle, endAngle)}
+                  fill="none"
+                  stroke={strokeColor}
+                  strokeWidth={strokeWidth}
+                  strokeLinecap="round"
+                  onClick={() => onJumpToStep?.(stepNumber)}
+                  className={`transition-all duration-700 ease-in-out cursor-pointer ${isActive ? 'stroke-brand-secondary' : 'stroke-brand-secondary/70'}`}
+                  style={{ 
+                    filter: isActive ? 'drop-shadow(0 0 6px rgba(155, 126, 236, 0.4))' : 'none',
+                  }}
+                />
+              </React.Fragment>
             );
           })}
         </svg>

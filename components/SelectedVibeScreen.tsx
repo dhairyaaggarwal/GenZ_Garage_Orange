@@ -4,36 +4,36 @@ import { Button } from './Button';
 import { CircularHeader } from './CircularHeader';
 import { speakBuddy } from '../utils/voice';
 
-interface SelectedHelpOptionsScreenProps {
-  selectedHelpOptions: string[];
+interface SelectedVibeScreenProps {
+  selectedVibes: string[];
   onContinue: () => void;
   onJumpToStep?: (step: number) => void;
 }
 
-const HELP_DISPLAY_MAP: Record<string, { text: string; emoji: string }> = {
-  teach_me: { text: 'Teach me about investing', emoji: '📘' },
-  invest_on_my_own: { text: 'Let me invest on my own', emoji: '📈' },
-  personalized_insights: { text: 'Personalized investing insights', emoji: '💡' },
-  dont_know: { text: 'I don’t know yet', emoji: '🤷‍♀️' },
+const VIBE_DISPLAY_MAP: Record<string, { text: string; emoji: string }> = {
+  it: { text: 'Tech Giants', emoji: '💻' },
+  fintech: { text: 'Modern Finance', emoji: '💳' },
+  digital_payments: { text: 'Digital India', emoji: '💸' },
+  renewable: { text: 'Green Energy', emoji: '☀️' },
+  ev: { text: 'Future Mobility', emoji: '🔋' },
+  green_energy: { text: 'Planet First', emoji: '🌱' },
+  pharma: { text: 'Life Savers', emoji: '💊' },
+  hospitals: { text: 'Safe Infrastructure', emoji: '🏥' },
+  biotech: { text: 'Health Innovation', emoji: '🧬' },
 };
 
-const VOICE_LINES: Record<string, string> = {
-  teach_me: "Love that! Learning the basics is the strongest way to build confidence.",
-  invest_on_my_own: "Amazing — I’ll give you the tools you need to invest with confidence.",
-  personalized_insights: "Personalized insights? Absolutely — I’ll tailor everything to your goals.",
-  dont_know: "Totally okay — we’ll figure out the best path together.",
-};
+const VOICE_LINES = [
+  "Solid choices! These sectors are the backbone of the new India.",
+  "Love that! Investing in things you use every day is a pro move.",
+  "Great eye — those areas are set for some exciting growth!",
+  "Nice! We'll make sure these vibes are front and center in your plan."
+];
 
-export const SelectedHelpOptionsScreen: React.FC<SelectedHelpOptionsScreenProps> = ({ selectedHelpOptions, onContinue, onJumpToStep }) => {
+export const SelectedVibeScreen: React.FC<SelectedVibeScreenProps> = ({ selectedVibes, onContinue, onJumpToStep }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const hasPlayedRef = useRef(false);
 
-  const generateVoiceText = () => {
-    const firstSelection = selectedHelpOptions.length > 0 ? selectedHelpOptions[0] : 'dont_know';
-    return VOICE_LINES[firstSelection] || VOICE_LINES['dont_know'];
-  };
-
-  const voiceText = useRef(generateVoiceText()).current;
+  const voiceText = useRef(VOICE_LINES[Math.floor(Math.random() * VOICE_LINES.length)]).current;
 
   useEffect(() => {
     const playVoice = () => {
@@ -63,7 +63,7 @@ export const SelectedHelpOptionsScreen: React.FC<SelectedHelpOptionsScreenProps>
 
       <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-2 overflow-y-auto no-scrollbar pb-32">
          <h1 className="text-3xl font-black text-brand-text text-center mb-6 leading-tight tracking-tight">
-           Got it — here’s how we can help
+           Love the vibe — here’s what you picked
          </h1>
 
          <div className="h-6 mb-8 flex items-center justify-center min-h-[24px]">
@@ -82,21 +82,25 @@ export const SelectedHelpOptionsScreen: React.FC<SelectedHelpOptionsScreenProps>
          </div>
 
          <div className="w-full grid gap-3">
-           {selectedHelpOptions.map((id) => {
-             const display = HELP_DISPLAY_MAP[id];
+           {selectedVibes.length > 0 ? selectedVibes.map((id) => {
+             const display = VIBE_DISPLAY_MAP[id];
              if (!display) return null;
              return (
                <div 
                  key={id}
                  className="w-full bg-white p-5 rounded-[2rem] border-2 border-brand-card flex items-center justify-between shadow-sm animate-in slide-in-from-bottom-3 fade-in duration-500"
                >
-                 <span className="text-lg font-bold text-brand-text text-left">
+                 <span className="text-lg font-bold text-brand-text">
                    {display.text}
                  </span>
                  <span className="text-2xl ml-2">{display.emoji}</span>
                </div>
              );
-           })}
+           }) : (
+             <div className="w-full bg-white p-8 rounded-[2rem] border-2 border-dashed border-brand-card flex items-center justify-center text-brand-subtext font-bold italic">
+               No specific vibes selected
+             </div>
+           )}
          </div>
       </div>
 

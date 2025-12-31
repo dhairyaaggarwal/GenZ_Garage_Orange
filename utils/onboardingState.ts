@@ -5,7 +5,8 @@ export interface OnboardingState {
   first_name: string | null;
   is_over_18: boolean | null;
   future_goals: string[];
-  investment_needs: string[];
+  investment_needs: string[]; // Generic needs (Teach me, etc.)
+  vibes: string[]; // Sector interests (Tech, EV, etc.)
   current_activities: string[];
   investment_horizon: string | null;
   risk_temperament: string | null;
@@ -21,6 +22,7 @@ const initialState: OnboardingState = {
   is_over_18: null,
   future_goals: [],
   investment_needs: [],
+  vibes: [],
   current_activities: [],
   investment_horizon: null,
   risk_temperament: null,
@@ -60,31 +62,28 @@ export function setValue(key: keyof OnboardingState, value: any) {
 }
 
 /**
- * Maps AppState to the 5-step conceptual progress bar.
+ * Maps AppState to the 5-step conceptual progress bar for the Onboarding UI.
  */
 export function getStepFromState(state: AppState): number {
   if (state <= AppState.AGE_CONFIRM) return 1;
   if (state <= AppState.SELECTED_GOALS) return 2;
-  if (state <= AppState.SELECTED_STATUS) return 3;
+  if (state <= AppState.SELECTED_VIBE || state === AppState.ONBOARDING_VIBE) return 3;
   if (state <= AppState.FINALIZE_PLAN) return 4;
   return 5;
 }
 
-/**
- * Returns the starting AppState for a conceptual step.
- */
 export function getStateFromStep(step: number): AppState {
   const mapping: Record<number, AppState> = {
     1: AppState.ASK_NAME,
     2: AppState.FUTURE_GOALS,
     3: AppState.HELP_OPTIONS,
-    4: AppState.INVESTMENT_DURATION,
+    4: AppState.INVESTING_STATUS,
     5: AppState.SIGNUP
   };
   return mapping[step] || AppState.ASK_NAME;
 }
 
-// 1. Numeric Mappings based on provided backend logic
+// Factor constants for risk engine
 const HORIZON_POINTS: Record<string, number> = {
   "lt_5": 1, "5_10": 2, "10_20": 3, "20_30": 4, "30_plus": 5, "dont_know": 2
 };
@@ -114,59 +113,55 @@ const LEVEL_PROFILE: Record<number, ProfileType> = {
   1: "CONSERVATIVE", 2: "MODERATE", 3: "BALANCED", 4: "GROWTH", 5: "AGGRESSIVE"
 };
 
-// Allocation Table strictly following the user's reference image
 const PORTFOLIO_ALLOCATIONS: Record<ProfileType, any> = {
   "CONSERVATIVE": {
     equity: 25, debt: 75, gold: 2, cash: 0,
-    expected_annual_return: "4–5%",
-    description: "Low-risk mix focused on protecting your money while still beating savings account/FD returns. Good for short-term or very cautious investors.",
-    nextStep: "Buddy suggests starting a small, regular SIP once live. Emphasise that this is a starter portfolio you can later step up from. Let's look at some basics!"
+    expected_annual_return: "4–6%",
+    description: "Safety-first mix to protect your capital while beating inflation.",
+    nextStep: "Focus on liquid funds and short-term debt."
   },
   "MODERATE": {
     equity: 55, debt: 45, gold: 2, cash: 0,
-    expected_annual_return: "6–7%",
-    description: "Balanced mix for beginners who want some growth but still care a lot about stability. Suitable for medium-term goals and 'not sure yet' users.",
-    nextStep: "Prompt yourself to start a SIP for 1-2 goals. Highlight: 'you can always adjust later' to reduce fear. Check out our SIP explainer!"
+    expected_annual_return: "7–9%",
+    description: "A balanced start for steady growth with manageable swings.",
+    nextStep: "Hybrid funds are your best friend."
   },
   "BALANCED": {
     equity: 70, debt: 30, gold: 2, cash: 0,
-    expected_annual_return: "8–10%",
-    description: "Growth-oriented mix with a safety cushion. Designed for long-term goals like financial independence or buying a house in 7–15 years.",
-    nextStep: "Encourage higher-ticket or multi-goal SIPs. Stick with us for the long term to see compounding in action through 10-20% drawdowns!"
+    expected_annual_return: "10–12%",
+    description: "The 'Sweet Spot' for long-term wealth creation.",
+    nextStep: "Diversify across large and mid-cap funds."
   },
   "GROWTH": {
     equity: 85, debt: 15, gold: 1, cash: 0,
-    expected_annual_return: "10–12%",
-    description: "High-growth mix with bigger ups and downs. For long-term, aggressive goals like retiring early where you can ignore short-term noise.",
-    nextStep: "Explicit risk warning active: 'check your comfort'. Suggest long horizon (10+ years) and recommend small step-up increases instead of lump sums."
+    expected_annual_return: "12–15%",
+    description: "Aggressive growth for long-term ambitions.",
+    nextStep: "Focus on sector-specific and small-cap opportunities."
   },
   "AGGRESSIVE": {
     equity: 95, debt: 5, gold: 0, cash: 0,
-    expected_annual_return: "12–15%",
-    description: "Very high-risk, high-return mix. Only for users who can handle large swings and stay invested 10+ years.",
-    nextStep: "Extra confirmation required: 'I understand large temporary losses can happen'. Consider splitting money between Aggressive + Balanced to provide a buffer."
+    expected_annual_return: "15%+",
+    description: "Maximum market exposure for the highest possible returns.",
+    nextStep: "Ensure you have a 10+ year time horizon."
   }
 };
 
 export function calculateRiskProfile(): RiskProfileData {
   const { investment_horizon, risk_temperament, future_goals, current_activities } = onboardingState;
 
-  // Step 3.1: Base Risk Score (Q1-Q4)
+  // 1. Quantitative Score (Horizon + Temperament)
   const q1 = HORIZON_POINTS[investment_horizon || "dont_know"] || 2;
-  const q2 = q1;
   const q3 = TEMPERAMENT_POINTS[risk_temperament || "moderate"] || 3;
-  const q4 = 3; // Fixed default
-  const totalScore = q1 + q2 + q3 + q4;
+  const baseScore = q1 + q3 + 6; // Standardizing to a ~20 point scale
 
-  // Step 3.2: Score -> Score Profile
   let scoreProfile: ProfileType;
-  if (totalScore <= 7) scoreProfile = "CONSERVATIVE";
-  else if (totalScore <= 10) scoreProfile = "MODERATE";
-  else if (totalScore <= 13) scoreProfile = "BALANCED";
-  else if (totalScore <= 16) scoreProfile = "GROWTH";
+  if (baseScore <= 7) scoreProfile = "CONSERVATIVE";
+  else if (baseScore <= 10) scoreProfile = "MODERATE";
+  else if (baseScore <= 13) scoreProfile = "BALANCED";
+  else if (baseScore <= 16) scoreProfile = "GROWTH";
   else scoreProfile = "AGGRESSIVE";
 
-  // Step 3.3: Intent Profile from Goals
+  // 2. Intent Bias (Based on Goals)
   let intentProfile: ProfileType = "MODERATE";
   if (future_goals && future_goals.length > 0) {
     const levels = future_goals.map(g => PROFILE_LEVEL[GOAL_PROFILE[g] || "MODERATE"]);
@@ -174,10 +169,10 @@ export function calculateRiskProfile(): RiskProfileData {
     intentProfile = LEVEL_PROFILE[Math.max(1, Math.min(5, avgGoalLevel))];
   }
 
-  // Step 3.4: Activity Adjusted Profile (Bias)
-  const ACTIVITY_PRIORITY = ["not_started", "saving", "investing", "saving_and_investing"];
+  // 3. Experience Bias (Current Activities)
   let bestActivity = "not_started";
   if (current_activities && current_activities.length > 0) {
+    const ACTIVITY_PRIORITY = ["not_started", "saving", "investing", "saving_and_investing"];
     current_activities.forEach(a => {
       if (ACTIVITY_PRIORITY.indexOf(a) > ACTIVITY_PRIORITY.indexOf(bestActivity)) {
         bestActivity = a;
@@ -185,34 +180,26 @@ export function calculateRiskProfile(): RiskProfileData {
     });
   }
   const bias = ACTIVITY_BIAS[bestActivity] || 0;
-  const activityLevel = Math.max(1, Math.min(5, PROFILE_LEVEL[scoreProfile] + bias));
-  const activityProfile = LEVEL_PROFILE[activityLevel];
-
-  // Step 3.5: Final Consensus Calculation
+  
+  // 4. Final Aggregation
   const intentLevel = PROFILE_LEVEL[intentProfile];
   const scoreLevel = PROFILE_LEVEL[scoreProfile];
-  const actLevel = PROFILE_LEVEL[activityProfile];
-  const avgConsensus = (intentLevel + scoreLevel + actLevel) / 3.0;
-
-  const frac = avgConsensus - Math.floor(avgConsensus);
-  let finalLevel = Math.floor(avgConsensus);
-  if (frac >= 0.75) {
-    finalLevel = Math.ceil(avgConsensus);
-  }
+  const avgLevel = Math.round((intentLevel + scoreLevel) / 2) + bias;
   
-  const finalProfile = LEVEL_PROFILE[Math.max(1, Math.min(5, finalLevel))];
+  const finalLevel = Math.max(1, Math.min(5, avgLevel));
+  const finalProfile = LEVEL_PROFILE[finalLevel];
   const alloc = PORTFOLIO_ALLOCATIONS[finalProfile];
 
   return {
     type: finalProfile,
-    score: totalScore,
+    score: baseScore,
     risk_level: finalLevel === 1 ? "Low" : finalLevel <= 3 ? "Moderate" : "High",
     equity_display: alloc.equity,
-    equity_min: Math.max(0, alloc.equity - 5),
-    equity_max: Math.min(100, alloc.equity + 5),
+    equity_min: Math.max(0, alloc.equity - 10),
+    equity_max: Math.min(100, alloc.equity + 10),
     debt_display: alloc.debt,
-    debt_min: Math.max(0, alloc.debt - 5),
-    debt_max: Math.min(100, alloc.debt + 5),
+    debt_min: Math.max(0, alloc.debt - 10),
+    debt_max: Math.min(100, alloc.debt + 10),
     gold: alloc.gold,
     cash: alloc.cash,
     expected_annual_return: alloc.expected_annual_return,

@@ -2,6 +2,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { Button } from './Button';
 import { CircularHeader } from './CircularHeader';
+import { speakBuddy } from '../utils/voice';
 
 interface SelectedGoalsScreenProps {
   selectedGoalIds: string[];
@@ -27,8 +28,6 @@ const VOICE_LINES: Record<string, string> = {
   dont_know: "Not sure yet? No worries — we’ll explore options together.",
 };
 
-const ELEVEN_LABS_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"; 
-
 export const SelectedGoalsScreen: React.FC<SelectedGoalsScreenProps> = ({ selectedGoalIds, onContinue, onJumpToStep }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const hasPlayedRef = useRef(false);
@@ -40,57 +39,21 @@ export const SelectedGoalsScreen: React.FC<SelectedGoalsScreenProps> = ({ select
 
   const voiceText = useRef(generateVoiceText()).current;
 
-  const playVoice = async () => {
-    if (hasPlayedRef.current) return;
-    hasPlayedRef.current = true;
-    setIsPlaying(true);
-
-    const apiKey = process.env.ELEVEN_LABS_API_KEY;
-    let audio: HTMLAudioElement | null = null;
-
-    if (apiKey) {
-      try {
-        const response = await fetch(
-          `https://api.elevenlabs.io/v1/text-to-speech/${ELEVEN_LABS_VOICE_ID}`, 
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'xi-api-key': apiKey },
-            body: JSON.stringify({
-              text: voiceText,
-              model_id: "eleven_monolingual_v1",
-              voice_settings: { stability: 0.5, similarity_boost: 0.75 }
-            })
-          }
-        );
-        if (response.ok) {
-          const blob = await response.blob();
-          const url = URL.createObjectURL(blob);
-          audio = new Audio(url);
-        }
-      } catch (e) {
-        console.warn("ElevenLabs failed");
-      }
-    }
-
-    if (!audio) {
-      const utterance = new SpeechSynthesisUtterance(voiceText);
-      utterance.rate = 1.15; 
-      utterance.pitch = 1.1;
-      utterance.onend = () => setIsPlaying(false);
-      window.speechSynthesis.speak(utterance);
-    } else {
-      audio.onended = () => setIsPlaying(false);
-      audio.play().catch(() => setIsPlaying(false));
-    }
-  };
-
   useEffect(() => {
-    setTimeout(playVoice, 500);
+    const playVoice = () => {
+      if (hasPlayedRef.current) return;
+      hasPlayedRef.current = true;
+      setIsPlaying(true);
+      speakBuddy(voiceText, () => setIsPlaying(false));
+    };
+
+    const timer = setTimeout(playVoice, 800);
     return () => { 
         window.speechSynthesis.cancel();
         setIsPlaying(false);
+        clearTimeout(timer);
     };
-  }, []);
+  }, [voiceText]);
 
   const handleContinue = () => {
       window.speechSynthesis.cancel();
@@ -148,7 +111,7 @@ export const SelectedGoalsScreen: React.FC<SelectedGoalsScreenProps> = ({ select
                fullWidth
                className="py-4 text-xl shadow-xl shadow-brand-primary/20"
             >
-               Sounds good — Let’s go
+               Continue
             </Button>
          </div>
       </div>

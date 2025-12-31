@@ -1,8 +1,7 @@
 
-import React, { useState, useEffect } from 'react';
-import { Button } from './Button';
+import React, { useState, useEffect, useRef } from 'react';
 import { CircularHeader } from './CircularHeader';
-import { getOnboardingState } from '../utils/onboardingState';
+import { speakBuddy, stopBuddy } from '../utils/voice';
 
 interface AgeConfirmScreenProps {
   onConfirm: (isOver18: boolean) => void;
@@ -12,23 +11,29 @@ interface AgeConfirmScreenProps {
 export const AgeConfirmScreen: React.FC<AgeConfirmScreenProps> = ({ onConfirm, onJumpToStep }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [selection, setSelection] = useState<boolean | null>(null);
-
-  const playVoice = async () => {
-    setIsPlaying(true);
-    const state = getOnboardingState();
-    const name = state.first_name || '';
-    const utterance = new SpeechSynthesisUtterance(`Nice to meet ya, ${name}! Are you older than 18?`);
-    utterance.onend = () => setIsPlaying(false);
-    window.speechSynthesis.speak(utterance);
-  };
+  const hasPlayedRef = useRef(false);
 
   useEffect(() => {
-    setTimeout(playVoice, 500);
-    return () => { window.speechSynthesis.cancel(); };
+    const playIntro = () => {
+      if (hasPlayedRef.current) return;
+      hasPlayedRef.current = true;
+      setIsPlaying(true);
+      
+      // Removed name as per user request to keep speech clean and non-repetitive
+      speakBuddy(`Nice to meet you! Are you older than 18?`, () => setIsPlaying(false));
+    };
+
+    const timer = setTimeout(playIntro, 800);
+    
+    return () => {
+      clearTimeout(timer);
+      stopBuddy();
+    };
   }, []);
 
   const handleSelection = (isOver18: boolean) => {
     setSelection(isOver18);
+    stopBuddy();
     setTimeout(() => onConfirm(isOver18), 300);
   };
 
@@ -61,6 +66,14 @@ export const AgeConfirmScreen: React.FC<AgeConfirmScreenProps> = ({ onConfirm, o
              <span className="text-3xl">🚫</span>
            </button>
          </div>
+         
+         {isPlaying && (
+           <div className="mt-8 flex items-center gap-1.5">
+             <div className="w-2.5 h-2.5 bg-brand-secondary rounded-full animate-bounce"></div>
+             <div className="w-2.5 h-2.5 bg-brand-secondary rounded-full animate-bounce delay-100"></div>
+             <div className="w-2.5 h-2.5 bg-brand-secondary rounded-full animate-bounce delay-200"></div>
+           </div>
+         )}
       </div>
     </div>
   );

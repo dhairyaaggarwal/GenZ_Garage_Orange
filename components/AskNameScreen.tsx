@@ -2,8 +2,9 @@
 import React, { useState, useEffect, useRef } from 'react';
 import { Button } from './Button';
 import { CircularHeader } from './CircularHeader';
-import { Mic, Volume2 } from 'lucide-react';
+import { Mic } from 'lucide-react';
 import { setValue, persistOnboardingState } from '../utils/onboardingState';
+import { speakBuddy, stopBuddy } from '../utils/voice';
 
 interface AskNameScreenProps {
   onContinue: () => void;
@@ -11,7 +12,6 @@ interface AskNameScreenProps {
 }
 
 const VOICE_TEXT = "I am so excited to help you! To get us moving, what’s your first name?";
-const ELEVEN_LABS_VOICE_ID = "21m00Tcm4TlvDq8ikWAM"; 
 
 export const AskNameScreen: React.FC<AskNameScreenProps> = ({ onContinue, onJumpToStep }) => {
   const [name, setName] = useState('');
@@ -19,60 +19,25 @@ export const AskNameScreen: React.FC<AskNameScreenProps> = ({ onContinue, onJump
   const inputRef = useRef<HTMLInputElement>(null);
   const hasPlayedRef = useRef(false);
 
-  const playVoice = async () => {
-    setIsPlaying(true);
-    const apiKey = (window as any).ELEVEN_LABS_API_KEY || process.env.ELEVEN_LABS_API_KEY;
-    let audio: HTMLAudioElement | null = null;
-
-    if (apiKey) {
-      try {
-        const response = await fetch(
-          `https://api.elevenlabs.io/v1/text-to-speech/${ELEVEN_LABS_VOICE_ID}`, 
-          {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json', 'xi-api-key': apiKey },
-            body: JSON.stringify({
-              text: VOICE_TEXT,
-              model_id: "eleven_monolingual_v1",
-              voice_settings: { stability: 0.5, similarity_boost: 0.75 }
-            })
-          }
-        );
-        if (response.ok) {
-          const blob = await response.blob();
-          const url = URL.createObjectURL(blob);
-          audio = new Audio(url);
-        }
-      } catch (e) {
-        console.warn("ElevenLabs failed");
-      }
-    }
-
-    if (!audio) {
-      const utterance = new SpeechSynthesisUtterance(VOICE_TEXT);
-      utterance.rate = 1.15; 
-      utterance.pitch = 1.1;
-      utterance.onend = () => setIsPlaying(false);
-      window.speechSynthesis.speak(utterance);
-    } else {
-      audio.onended = () => setIsPlaying(false);
-      audio.play().catch(() => setIsPlaying(false));
-    }
-  };
-
   useEffect(() => {
-    if (!hasPlayedRef.current) {
-      setTimeout(playVoice, 800);
+    const timer = setTimeout(() => {
+      if (hasPlayedRef.current) return;
       hasPlayedRef.current = true;
-    }
-    return () => window.speechSynthesis.cancel();
+      setIsPlaying(true);
+      speakBuddy(VOICE_TEXT, () => setIsPlaying(false));
+    }, 800);
+
+    return () => {
+      clearTimeout(timer);
+      stopBuddy();
+    };
   }, []);
 
   const handleContinue = () => {
     if (name.trim()) {
       setValue('first_name', name.trim());
       persistOnboardingState();
-      window.speechSynthesis.cancel();
+      stopBuddy();
       onContinue();
     }
   };
@@ -101,19 +66,6 @@ export const AskNameScreen: React.FC<AskNameScreenProps> = ({ onContinue, onJump
             />
             <button className="absolute right-6 top-1/2 -translate-y-1/2 text-brand-muted hover:text-brand-secondary p-2">
               <Mic size={24} />
-            </button>
-         </div>
-         <div className="flex items-center gap-3 text-brand-subtext font-bold text-sm bg-white/50 px-6 py-2.5 rounded-full border border-brand-card shadow-sm">
-            <span>Buddy wants to know!</span>
-            <button 
-              onClick={() => {
-                window.speechSynthesis.cancel();
-                playVoice();
-              }} 
-              className={`${isPlaying ? 'text-brand-secondary' : 'text-brand-muted hover:text-brand-text'} transition-colors`}
-              aria-label="Replay Buddy's voice"
-            >
-               <Volume2 size={22} className={isPlaying ? 'animate-pulse' : ''} />
             </button>
          </div>
       </div>

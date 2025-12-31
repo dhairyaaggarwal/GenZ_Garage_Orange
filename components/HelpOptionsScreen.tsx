@@ -1,8 +1,8 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Button } from './Button';
 import { CircularHeader } from './CircularHeader';
-import { getOnboardingState } from '../utils/onboardingState';
+import { speakBuddy } from '../utils/voice';
 
 interface HelpOptionsScreenProps {
   onContinue: (selectedOptions: string[]) => void;
@@ -18,13 +18,20 @@ const HELP_OPTIONS = [
 
 export const HelpOptionsScreen: React.FC<HelpOptionsScreenProps> = ({ onContinue, onJumpToStep }) => {
   const [selectedOptions, setSelectedOptions] = useState<string[]>([]);
+  const hasPlayedRef = useRef(false);
 
   useEffect(() => {
-    const text = `How can we help achieve your goals?`;
-    const utterance = new SpeechSynthesisUtterance(text);
-    utterance.rate = 1.15;
-    window.speechSynthesis.speak(utterance);
-    return () => window.speechSynthesis.cancel();
+    const playVoice = () => {
+      if (hasPlayedRef.current) return;
+      hasPlayedRef.current = true;
+      speakBuddy(`How can we help achieve your goals?`);
+    };
+
+    const timer = setTimeout(playVoice, 800);
+    return () => {
+      window.speechSynthesis.cancel();
+      clearTimeout(timer);
+    };
   }, []);
 
   const toggleOption = (id: string) => {

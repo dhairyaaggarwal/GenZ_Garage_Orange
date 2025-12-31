@@ -1,7 +1,8 @@
 
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useState, useRef } from 'react';
 import { Button } from './Button';
 import { CircularHeader } from './CircularHeader';
+import { speakBuddy, stopBuddy } from '../utils/voice';
 
 interface InvestmentDurationScreenProps {
   onContinue: (duration: string) => void;
@@ -19,12 +20,21 @@ const DURATION_OPTIONS = [
 
 export const InvestmentDurationScreen: React.FC<InvestmentDurationScreenProps> = ({ onContinue, onJumpToStep }) => {
   const [selectedDuration, setSelectedDuration] = useState<string | null>(null);
+  const hasPlayedRef = useRef(false);
 
   useEffect(() => {
-    const utterance = new SpeechSynthesisUtterance("How long do you plan to invest?");
-    utterance.rate = 1.1;
-    window.speechSynthesis.speak(utterance);
-    return () => window.speechSynthesis.cancel();
+    const playVoice = () => {
+      if (hasPlayedRef.current) return;
+      hasPlayedRef.current = true;
+      
+      speakBuddy(`How long do you want to stay invested? Quick gains are tempting — but real growth usually comes when you stay invested longer.`);
+    };
+
+    const timer = setTimeout(playVoice, 800);
+    return () => {
+      clearTimeout(timer);
+      stopBuddy();
+    };
   }, []);
 
   return (
