@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { InvestmentPlan } from '../types';
 import { Button } from './Button';
-import { ArrowLeft, Sparkles, ShieldCheck, TrendingUp, Lock, ChevronRight, X, Info } from 'lucide-react';
+import { ArrowLeft, ShieldCheck, TrendingUp, ChevronRight, X, Info } from 'lucide-react';
 import { calculateRiskProfile } from '../utils/onboardingState';
 
 interface PlaylistResultScreenProps {
@@ -23,6 +23,26 @@ export const PlaylistResultScreen: React.FC<PlaylistResultScreenProps> = ({ plan
     return '✨';
   };
 
+  const getKidFriendlyExplanation = (name: string) => {
+    const n = name.toLowerCase();
+    if (n.includes('nifty 50')) {
+      return "The Nifty 50 is like a team of the 50 strongest superheroes in India. When the whole team plays well and wins, you win too!";
+    }
+    if (n.includes('equity') || n.includes('stock')) {
+      return "Imagine buying a tiny piece of your favorite toy shop. When the shop sells lots of toys, your tiny piece grows and becomes more valuable!";
+    }
+    if (n.includes('gold')) {
+      return "Gold is like a shiny, magical shield. Even when things get a bit scary in the world, this shield stays strong and keeps your money safe.";
+    }
+    if (n.includes('debt') || n.includes('bond')) {
+      return "This is like lending your toy to a very good friend. They promise to give it back later and give you a little candy as a 'thank you' for letting them use it!";
+    }
+    if (n.includes('liquid')) {
+      return "This is like a super-powered piggy bank. It grows a tiny bit every single day, and you can take your money out whenever you need to buy a chocolate!";
+    }
+    return "This is a special way to help your money grow bigger while you sleep, chosen just for your specific goals!";
+  };
+
   const getColorForAsset = (name: string) => {
     const n = name.toLowerCase();
     if (n.includes('equity')) return 'bg-brand-secondary/20';
@@ -36,12 +56,12 @@ export const PlaylistResultScreen: React.FC<PlaylistResultScreenProps> = ({ plan
       {/* Asset Explainer Modal */}
       {modalContent && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl">
-           <div className={`${modalContent.color} w-full max-w-sm rounded-[3rem] p-8 text-[#120826] relative overflow-hidden animate-in zoom-in duration-300`}>
+           <div className={`${modalContent.color} w-full max-w-sm rounded-[3rem] p-8 text-[#120826] relative overflow-hidden animate-in zoom-in duration-300 shadow-2xl`}>
               <button onClick={() => setModalContent(null)} className="absolute top-6 right-6 p-2 bg-black/10 rounded-full">
                 <X size={20} />
               </button>
               <div className="w-16 h-16 bg-white/20 rounded-2xl flex items-center justify-center mb-6 shadow-xl text-3xl">{modalContent.emoji}</div>
-              <h3 className="text-2xl font-black mb-4 uppercase leading-none">{modalContent.title}</h3>
+              <h3 className="text-2xl font-black mb-4 uppercase leading-none tracking-tight">{modalContent.title}</h3>
               <p className="text-sm font-bold leading-relaxed">{modalContent.body}</p>
               <Button onClick={() => setModalContent(null)} fullWidth className="mt-8 bg-[#120826] text-white py-4 rounded-2xl border-none">
                  Got it, Buddy!
@@ -73,15 +93,7 @@ export const PlaylistResultScreen: React.FC<PlaylistResultScreenProps> = ({ plan
                  <span className="text-[10px] font-black text-brand-success leading-tight">{plan.expectedReturn || riskProfile.expected_annual_return}</span>
               </div>
             </div>
-            
-            <div className="bg-white/5 border border-white/10 p-6 rounded-[2.5rem] relative overflow-hidden group">
-               <div className="absolute top-0 right-0 p-4 opacity-5 group-hover:scale-125 transition-transform">
-                  <Sparkles size={48} />
-               </div>
-               <p className="text-sm font-medium text-white/80 leading-relaxed italic relative z-10">
-                  "{plan.rationale}"
-               </p>
-            </div>
+            {/* Removed rationale text block per user request */}
           </div>
         </div>
 
@@ -104,25 +116,25 @@ export const PlaylistResultScreen: React.FC<PlaylistResultScreenProps> = ({ plan
                   key={idx}
                   onClick={() => setModalContent({
                     title: alloc.assetClass,
-                    body: `This part of your plan is focused on ${alloc.assetClass}. It helps you balance growth with safety to reach your specific goals.`,
+                    body: getKidFriendlyExplanation(alloc.assetClass),
                     emoji: getEmojiForAsset(alloc.assetClass),
                     color: alloc.assetClass.toLowerCase().includes('equity') ? 'bg-[#D8C8EE]' : 'bg-[#FFB7A5]'
                   })}
                   className="w-full bg-white/5 border border-white/5 p-5 rounded-3xl flex items-center justify-between cursor-pointer active:scale-[0.98] transition-all hover:bg-white/10 text-left"
                 >
-                  <div className="flex items-center gap-4 pointer-events-none">
-                    <div className={`w-12 h-12 rounded-2xl ${getColorForAsset(alloc.assetClass)} flex items-center justify-center text-2xl`}>
+                  <div className="flex items-center gap-4 pointer-events-none flex-1 overflow-hidden">
+                    <div className={`w-12 h-12 rounded-2xl ${getColorForAsset(alloc.assetClass)} flex items-center justify-center text-2xl shrink-0`}>
                       {getEmojiForAsset(alloc.assetClass)}
                     </div>
-                    <div>
-                      <div className="flex items-center gap-1.5">
-                        <h4 className="font-black text-sm uppercase leading-tight">{alloc.assetClass}</h4>
-                        <div className="bg-white/10 p-1 rounded-full"><Info size={10} className="text-white/40" /></div>
+                    <div className="flex-1 overflow-hidden">
+                      <div className="flex items-center gap-2">
+                        <h4 className="font-black text-[13px] uppercase leading-tight truncate">{alloc.assetClass}</h4>
+                        <div className="bg-white/10 p-1.5 rounded-full shrink-0"><Info size={12} className="text-white/40" /></div>
                       </div>
                       <p className="text-[9px] text-white/40 font-bold uppercase tracking-wider">Target Weight</p>
                     </div>
                   </div>
-                  <span className="font-black text-brand-primary text-xl pointer-events-none">{alloc.percentage}%</span>
+                  <span className="font-black text-brand-primary text-xl pointer-events-none ml-4">{alloc.percentage}%</span>
                 </button>
               ))}
             </div>

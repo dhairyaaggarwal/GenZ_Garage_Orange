@@ -1,3 +1,4 @@
+
 import React, { useEffect, useRef, useState } from 'react';
 import { CircularHeader } from './CircularHeader';
 
@@ -39,7 +40,7 @@ export const InvestedBeforeScreen: React.FC<InvestedBeforeScreenProps> = ({ onCo
       
       <div className="flex-1 flex flex-col items-center justify-center px-6 z-10 w-full max-w-md mx-auto -mt-10">
          <h1 className="text-4xl text-brand-text text-center font-black mb-10 leading-tight">
-           Have you invested before?
+           Have you <span className="italic font-serif text-brand-secondary">invested before?</span>
          </h1>
          
          <div className="w-full space-y-4">

@@ -45,7 +45,7 @@ export const FutureGoalsScreen: React.FC<FutureGoalsScreenProps> = ({ onContinue
       
       <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto overflow-y-auto no-scrollbar pb-32">
          <h1 className="text-4xl text-brand-text text-center font-black mb-6 leading-tight mt-4">
-           What are your future goals?
+           What are your <span className="italic font-serif text-brand-secondary">future goals?</span>
          </h1>
 
          <div className="w-full space-y-3">

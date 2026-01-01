@@ -45,8 +45,7 @@ export const RiskToleranceScreen: React.FC<RiskToleranceScreenProps> = ({ onCont
       if (hasPlayedRef.current) return;
       hasPlayedRef.current = true;
       
-      // Removed name injection as per user request
-      speakBuddy(`Last question on this part. How do you feel about your money growing over time? There are no wrong answers here, and you can change your mind anytime.`);
+      speakBuddy(`How do you feel about your money growing over time? There are no wrong answers here.`);
     };
 
     const timer = setTimeout(playVoice, 800);
@@ -62,10 +61,9 @@ export const RiskToleranceScreen: React.FC<RiskToleranceScreenProps> = ({ onCont
       <CircularHeader currentStep={4} totalSteps={5} onJumpToStep={onJumpToStep} />
 
       <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-6 overflow-hidden">
-         <h1 className="text-3xl text-brand-text text-center font-black mb-2 leading-tight shrink-0">
+         <h1 className="text-3xl text-brand-text text-center font-black mb-8 leading-tight shrink-0">
            What's your <span className="text-brand-secondary italic font-serif">comfort level?</span>
          </h1>
-         <p className="text-center text-brand-subtext text-sm font-medium mb-8">This helps Buddy pick the right speed for you.</p>
 
          <div className="w-full flex-1 overflow-y-auto no-scrollbar pb-32 space-y-4">
            {RISK_OPTIONS.map((option) => {

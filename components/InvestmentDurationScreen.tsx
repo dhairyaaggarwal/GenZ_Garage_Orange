@@ -42,8 +42,8 @@ export const InvestmentDurationScreen: React.FC<InvestmentDurationScreenProps> =
       <CircularHeader currentStep={4} totalSteps={5} onJumpToStep={onJumpToStep} />
       
       <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-6 overflow-hidden">
-         <h1 className="text-3xl text-brand-text text-center mb-6 leading-tight shrink-0">
-           How long do you plan to invest?
+         <h1 className="text-3xl text-brand-text text-center font-black mb-6 leading-tight shrink-0">
+           How long do you <span className="italic font-serif text-brand-secondary">plan to invest?</span>
          </h1>
 
          <div className="w-full flex-1 overflow-y-auto no-scrollbar pb-32 space-y-3">

@@ -43,7 +43,7 @@ export const AgeConfirmScreen: React.FC<AgeConfirmScreenProps> = ({ onConfirm, o
       
       <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-6">
          <h1 className="text-4xl text-brand-text text-center font-black mb-12 leading-tight">
-           Are you over 18?
+           Are you <span className="italic font-serif text-brand-secondary">over 18?</span>
          </h1>
 
          <div className="w-full space-y-4">

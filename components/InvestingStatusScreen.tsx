@@ -44,8 +44,8 @@ export const InvestingStatusScreen: React.FC<InvestingStatusScreenProps> = ({ on
       <CircularHeader currentStep={3} totalSteps={5} onJumpToStep={onJumpToStep} />
       
       <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto overflow-y-auto no-scrollbar pb-32">
-         <h1 className="text-4xl text-brand-text text-center mb-6 leading-tight mt-4">
-           Are you currently investing or saving?
+         <h1 className="text-4xl text-brand-text text-center font-black mb-6 leading-tight mt-4">
+           Are you currently <span className="italic font-serif text-brand-secondary">investing or saving?</span>
          </h1>
 
          <div className="w-full space-y-3">
