@@ -61,7 +61,7 @@ export const RiskToleranceScreen: React.FC<RiskToleranceScreenProps> = ({ onCont
       <CircularHeader currentStep={4} totalSteps={5} onJumpToStep={onJumpToStep} />
 
       <div className="flex-1 flex flex-col items-center px-6 z-10 w-full max-w-md mx-auto mt-6 overflow-hidden">
-         <h1 className="text-3xl text-brand-text text-center font-black mb-8 leading-tight shrink-0">
+         <h1 className="text-3xl text-brand-text text-center font-black mb-10 leading-tight shrink-0">
            What's your <span className="text-brand-secondary italic font-serif">comfort level?</span>
          </h1>
 

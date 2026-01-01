@@ -31,11 +31,11 @@ import { InvestmentPlan, AppState, Playlist } from './types';
 const INITIAL_PLAYLISTS: Playlist[] = [
   { 
     id: "make_in_india", 
-    title: "Make In India", 
+    title: "MAKE IN INDIA", 
     emoji: "🇮🇳", 
     returns: "24.5%", 
     numericReturn: 0.245, 
-    color: "bg-[#FFB7A5]",
+    color: "bg-brand-tertiary", 
     description: "Focuses on Indian manufacturing giants benefiting from government push and localization.",
     items: [
       { name: "Tata Motors", returns: "28%", weight: "40%", icon: "🚗" },
@@ -45,16 +45,58 @@ const INITIAL_PLAYLISTS: Playlist[] = [
   },
   { 
     id: "digital_first", 
-    title: "Digital First", 
+    title: "DIGITAL FIRST", 
     emoji: "🌐", 
-    returns: "31.2%", 
-    numericReturn: 0.312, 
-    color: "bg-[#DFFF4F]",
+    returns: "31.6%", 
+    numericReturn: 0.316, 
+    color: "bg-brand-primary", 
     description: "The stars of Digital India. Includes top tech services and consumer platforms.",
     items: [
       { name: "Zomato", returns: "45%", weight: "35%", icon: "🍕" },
       { name: "Infosys", returns: "12%", weight: "35%", icon: "💻" },
       { name: "PB Fintech", returns: "22%", weight: "30%", icon: "🛡️" }
+    ]
+  },
+  { 
+    id: "consumer_kings", 
+    title: "CONSUMER KINGS", 
+    emoji: "🛍️", 
+    returns: "18.2%", 
+    numericReturn: 0.182, 
+    color: "bg-[#D8C8EE]", 
+    description: "Stable growth from the brands you use every day—from home paints to snacks.",
+    items: [
+      { name: "Asian Paints", returns: "14%", weight: "40%", icon: "🎨" },
+      { name: "HUL", returns: "10%", weight: "35%", icon: "🧴" },
+      { name: "Titan", returns: "26%", weight: "25%", icon: "⌚" }
+    ]
+  },
+  { 
+    id: "green_future", 
+    title: "GREEN FUTURE", 
+    emoji: "🌿", 
+    returns: "29.4%", 
+    numericReturn: 0.294, 
+    color: "bg-emerald-200", 
+    description: "Investing in a cleaner tomorrow with solar energy and EV infrastructure.",
+    items: [
+      { name: "Tata Power", returns: "32%", weight: "40%", icon: "⚡" },
+      { name: "Adani Green", returns: "38%", weight: "30%", icon: "☀️" },
+      { name: "JSW Energy", returns: "22%", weight: "30%", icon: "🌊" }
+    ]
+  },
+  { 
+    id: "it_titans", 
+    title: "IT TITANS", 
+    emoji: "💻", 
+    returns: "14.8%", 
+    numericReturn: 0.148, 
+    color: "bg-blue-200", 
+    description: "The global software giants that power the world's biggest corporations.",
+    items: [
+      { name: "TCS", returns: "12%", weight: "40%", icon: "🚀" },
+      { name: "HCL Tech", returns: "16%", weight: "30%", icon: "🛠️" },
+      { name: "Wipro", returns: "11%", weight: "30%", icon: "🧼" }
     ]
   },
 ];

@@ -1,8 +1,9 @@
 
 import React, { useState } from 'react';
-import { Home as HomeIcon, GraduationCap, Flame, Menu } from 'lucide-react';
+import { Home as HomeIcon, GraduationCap, Flame, Menu, Star } from 'lucide-react';
 import { Playlist } from '../types';
 import { ProfileOverlay } from './ProfileOverlay';
+import { getOnboardingState } from '../utils/onboardingState';
 
 interface HomeScreenProps {
   playlists: Playlist[];
@@ -28,6 +29,7 @@ const BRAND_ICONS = [
 export const HomeScreen: React.FC<HomeScreenProps> = ({ playlists, onSelectPlaylist, onCreatePlaylist }) => {
   const [showToast, setShowToast] = useState(false);
   const [showProfile, setShowProfile] = useState(false);
+  const state = getOnboardingState();
 
   const handleFeatureClick = () => {
     setShowToast(true);
@@ -37,6 +39,15 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ playlists, onSelectPlayl
   const handleReset = () => {
     localStorage.clear();
     window.location.reload();
+  };
+
+  // Logic to check if a curated playlist matches user vibes
+  const doesMatchVibe = (playlistId: string) => {
+    const userVibes = state.vibes || [];
+    if (playlistId === 'digital_first' && (userVibes.includes('it') || userVibes.includes('digital_payments'))) return true;
+    if (playlistId === 'make_in_india' && userVibes.includes('india_growth')) return true;
+    if (playlistId === 'green_future' && (userVibes.includes('renewable') || userVibes.includes('ev'))) return true;
+    return false;
   };
 
   return (
@@ -72,7 +83,8 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ playlists, onSelectPlayl
           </button>
         </header>
 
-        <section className="relative h-[400px] w-full mt-[-20px] overflow-hidden">
+        {/* HERO SECTION */}
+        <section className="relative h-[380px] w-full mt-[-20px] overflow-hidden">
           {BRAND_ICONS.map((brand, i) => (
             <div 
               key={i}
@@ -96,28 +108,29 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ playlists, onSelectPlayl
               <span className="italic font-serif text-brand-primary">we guide</span>
             </h1>
             <p className="text-white/60 font-medium text-sm max-w-[280px] leading-relaxed">
-              A best way to begin investing at your pace 💪🏽
+              A better way to begin investing at your pace 💪🏽
             </p>
           </div>
         </section>
 
-        <div className="px-6 space-y-6">
+        <div className="px-6 space-y-8">
+          
           <div className="flex gap-4">
-            <button onClick={handleFeatureClick} className="flex-1 bg-[#FFB7A5] p-6 rounded-[2.5rem] text-[#120826] text-left relative overflow-hidden h-[160px]">
-              <h3 className="text-xl font-black leading-tight mb-2 uppercase">Learn to invest</h3>
-              <p className="text-[11px] font-bold text-black/50 leading-tight">Master the basics in 100+ tiny lessons.</p>
-              <div className="absolute bottom-[-10px] right-[-10px] text-6xl opacity-30 rotate-12">🎓</div>
+            <button onClick={handleFeatureClick} className="flex-1 bg-brand-tertiary p-6 rounded-[2.5rem] text-[#120826] text-left relative overflow-hidden h-[150px]">
+              <h3 className="text-xl font-black leading-tight mb-2 uppercase tracking-tighter">Learn to<br/>invest</h3>
+              <p className="text-[10px] font-bold text-black/50 leading-tight">Master the basics in<br/>100+ tiny lessons.</p>
+              <div className="absolute bottom-[-10px] right-[-10px] text-6xl opacity-20 rotate-12">🎓</div>
             </button>
           </div>
 
-          <button onClick={onCreatePlaylist} className="w-full bg-[#D8C8EE] rounded-[2.5rem] p-8 text-[#120826] text-left relative overflow-hidden flex justify-between items-center h-[160px]">
+          <button onClick={onCreatePlaylist} className="w-full bg-brand-card rounded-[2.5rem] p-8 text-[#120826] text-left relative overflow-hidden flex justify-between items-center h-[160px] shadow-xl">
             <div className="max-w-[70%] relative z-10">
-              <p className="text-[10px] font-black text-black/40 mb-1 uppercase tracking-widest">Your investing personality</p>
-              <h3 className="text-3xl font-black leading-[0.9] uppercase tracking-tighter">CREATE YOUR OWN <span className="text-[#9B7EEC] italic">PLAYLIST</span></h3>
+              <p className="text-[9px] font-black text-black/40 mb-1 uppercase tracking-widest leading-none">Your investing personality</p>
+              <h3 className="text-3xl font-black leading-[0.85] uppercase tracking-tighter">CREATE YOUR<br/>OWN <span className="text-[#9B7EEC] italic">PLAYLIST</span></h3>
             </div>
-            <div className="relative w-16 h-16 mr-[-20px] rotate-12">
-               <div className="absolute top-0 right-0 w-16 h-20 bg-[#FF6B6B] rounded-2xl shadow-lg border border-black/5"></div>
-               <div className="absolute top-2 right-4 w-16 h-20 bg-[#DFFF4F] rounded-2xl shadow-lg border border-black/5 -translate-x-4"></div>
+            <div className="relative w-16 h-16 mr-[-20px] rotate-12 shrink-0">
+               <div className="absolute top-0 right-0 w-16 h-20 bg-brand-tertiary rounded-2xl shadow-lg border border-black/5"></div>
+               <div className="absolute top-2 right-4 w-16 h-20 bg-brand-primary rounded-2xl shadow-lg border border-black/5 -translate-x-4"></div>
             </div>
           </button>
 
@@ -130,20 +143,32 @@ export const HomeScreen: React.FC<HomeScreenProps> = ({ playlists, onSelectPlayl
                     <span className="text-[8px] font-black uppercase text-brand-success tracking-widest">Live Updates</span>
                 </div>
              </div>
-             <div className="flex gap-4 overflow-x-auto no-scrollbar -mx-6 px-6">
-                {playlists.map((p) => (
-                   <button 
-                     key={p.id} 
-                     onClick={() => onSelectPlaylist(p)}
-                     className={`min-w-[140px] h-[180px] ${p.color} rounded-[2.5rem] p-5 flex flex-col justify-between text-[#120826] shadow-xl text-left active:scale-95 transition-transform`}
-                   >
-                      <span className="text-3xl">{p.emoji}</span>
-                      <div>
-                        <h4 className="font-black text-sm uppercase leading-tight mb-1">{p.title}</h4>
-                        <p className="text-[10px] font-black text-black/40">↑ {p.returns}</p>
-                      </div>
-                   </button>
-                ))}
+             
+             <div className="flex gap-4 overflow-x-auto no-scrollbar -mx-6 px-6 pb-4">
+                {playlists.map((p) => {
+                   const isRecommended = doesMatchVibe(p.id);
+                   return (
+                     <button 
+                       key={p.id} 
+                       onClick={() => onSelectPlaylist(p)}
+                       className={`min-w-[155px] h-[200px] ${p.color} rounded-[2.5rem] p-6 flex flex-col justify-between text-[#120826] shadow-xl text-left active:scale-95 transition-transform relative overflow-hidden`}
+                     >
+                        {isRecommended && (
+                          <div className="absolute top-4 right-4 animate-in zoom-in">
+                             <div className="bg-[#120826] text-white p-1 rounded-full"><Star size={10} fill="currentColor" /></div>
+                          </div>
+                        )}
+                        <span className="text-3xl">{p.emoji}</span>
+                        <div>
+                          {isRecommended && (
+                            <p className="text-[7px] font-black text-[#120826]/40 uppercase tracking-widest mb-1">Matches your Vibe</p>
+                          )}
+                          <h4 className="font-black text-[15px] uppercase leading-none mb-1 tracking-tighter">{p.title}</h4>
+                          <p className="text-[11px] font-black text-black/40">↑ {p.returns}</p>
+                        </div>
+                     </button>
+                   );
+                })}
              </div>
           </div>
         </div>

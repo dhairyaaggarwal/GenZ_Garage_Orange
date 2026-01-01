@@ -29,18 +29,18 @@ export const PlaylistResultScreen: React.FC<PlaylistResultScreenProps> = ({ plan
       return "The Nifty 50 is like a team of the 50 strongest superheroes in India. When the whole team plays well and wins, you win too!";
     }
     if (n.includes('equity') || n.includes('stock')) {
-      return "Imagine buying a tiny piece of your favorite toy shop. When the shop sells lots of toys, your tiny piece grows and becomes more valuable!";
+      return "Imagine buying a tiny slice of your favorite pizza shop. When the shop sells lots of pizza, your tiny slice becomes even bigger and more valuable!";
     }
     if (n.includes('gold')) {
-      return "Gold is like a shiny, magical shield. Even when things get a bit scary in the world, this shield stays strong and keeps your money safe.";
+      return "Gold is like a shiny, magical shield. Even when things get a bit scary in the world, this shield stays strong and keeps your treasure safe.";
     }
     if (n.includes('debt') || n.includes('bond')) {
-      return "This is like lending your toy to a very good friend. They promise to give it back later and give you a little candy as a 'thank you' for letting them use it!";
+      return "This is like lending your toy to a very good friend. They promise to give it back later and give you a little chocolate as a 'thank you'!";
     }
     if (n.includes('liquid')) {
-      return "This is like a super-powered piggy bank. It grows a tiny bit every single day, and you can take your money out whenever you need to buy a chocolate!";
+      return "This is like a super-powered piggy bank. It grows a tiny bit every day, and you can take your money out whenever you want to buy a candy!";
     }
-    return "This is a special way to help your money grow bigger while you sleep, chosen just for your specific goals!";
+    return "This is a special way Buddy chose to help your money grow bigger while you sleep, based exactly on what you told me!";
   };
 
   const getColorForAsset = (name: string) => {
@@ -53,7 +53,7 @@ export const PlaylistResultScreen: React.FC<PlaylistResultScreenProps> = ({ plan
   return (
     <div className="screen-container bg-[#121826] text-white overflow-hidden">
       
-      {/* Asset Explainer Modal */}
+      {/* Asset Explainer Modal - EL5 Style */}
       {modalContent && (
         <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-black/80 backdrop-blur-xl">
            <div className={`${modalContent.color} w-full max-w-sm rounded-[3rem] p-8 text-[#120826] relative overflow-hidden animate-in zoom-in duration-300 shadow-2xl`}>
@@ -93,7 +93,7 @@ export const PlaylistResultScreen: React.FC<PlaylistResultScreenProps> = ({ plan
                  <span className="text-[10px] font-black text-brand-success leading-tight">{plan.expectedReturn || riskProfile.expected_annual_return}</span>
               </div>
             </div>
-            {/* Removed rationale text block per user request */}
+            {/* Removed rationale text block per user request to keep UI clean */}
           </div>
         </div>
 
@@ -129,7 +129,9 @@ export const PlaylistResultScreen: React.FC<PlaylistResultScreenProps> = ({ plan
                     <div className="flex-1 overflow-hidden">
                       <div className="flex items-center gap-2">
                         <h4 className="font-black text-[13px] uppercase leading-tight truncate">{alloc.assetClass}</h4>
-                        <div className="bg-white/10 p-1.5 rounded-full shrink-0"><Info size={12} className="text-white/40" /></div>
+                        <div className="bg-white/10 p-1.5 rounded-full shrink-0">
+                          <Info size={12} className="text-white/40" />
+                        </div>
                       </div>
                       <p className="text-[9px] text-white/40 font-bold uppercase tracking-wider">Target Weight</p>
                     </div>
